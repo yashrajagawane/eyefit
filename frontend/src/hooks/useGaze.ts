@@ -1,9 +1,13 @@
 import { useState, useEffect, useRef } from "react";
 import { FaceTracker } from "../vision/face/FaceTracker";
-import { GazeAnalyzer, GazeResult, GazeState } from "../vision/gaze/GazeAnalyzer";
+import { GazeAnalyzer, GazeResult, GazeState, GazeThresholds } from "../vision/gaze/GazeAnalyzer";
 
-export function useGaze(videoRef: React.RefObject<HTMLVideoElement | null>, isPlaying: boolean) {
-  const [gazeResult, setGazeResult] = useState<GazeResult>({ state: GazeState.CENTER, confidence: 100 });
+export function useGaze(
+  videoRef: React.RefObject<HTMLVideoElement | null>, 
+  isPlaying: boolean,
+  thresholds?: GazeThresholds
+) {
+  const [gazeResult, setGazeResult] = useState<GazeResult>({ state: GazeState.CENTER, confidence: 100, rawRatio: 0.5 });
   const [isVisionReady, setIsVisionReady] = useState(false);
   
   const faceTrackerRef = useRef<FaceTracker | null>(null);
@@ -52,7 +56,7 @@ export function useGaze(videoRef: React.RefObject<HTMLVideoElement | null>, isPl
         const landmarks = faceTrackerRef.current?.detectFace(video, timestampMs);
         
         if (landmarks && gazeAnalyzerRef.current) {
-          const result = gazeAnalyzerRef.current.analyze(landmarks);
+          const result = gazeAnalyzerRef.current.analyze(landmarks, thresholds);
           // Only trigger a re-render if the state actually changes or we want continuous confidence updates
           // For now, we update it continuously so the debug UI shows live confidence
           setGazeResult(result);
@@ -67,7 +71,7 @@ export function useGaze(videoRef: React.RefObject<HTMLVideoElement | null>, isPl
     return () => {
       cancelAnimationFrame(requestRef.current);
     };
-  }, [isVisionReady, isPlaying, videoRef]);
+  }, [isVisionReady, isPlaying, videoRef, thresholds]);
 
   return {
     gazeResult,

@@ -9,6 +9,12 @@ export enum GazeState {
 export interface GazeResult {
   state: GazeState;
   confidence: number;
+  rawRatio: number;
+}
+
+export interface GazeThresholds {
+  upThreshold: number;
+  downThreshold: number;
 }
 
 export class GazeAnalyzer {
@@ -26,7 +32,7 @@ export class GazeAnalyzer {
   private history: GazeState[] = [];
   private readonly historySize = 5;
 
-  public analyze(landmarks: NormalizedLandmark[]): GazeResult {
+  public analyze(landmarks: NormalizedLandmark[], thresholds?: GazeThresholds): GazeResult {
     // 1. Calculate vertical gaze ratio for Left Eye
     const leftRatio = this.calculateVerticalRatio(
       landmarks[GazeAnalyzer.LEFT_EYE_TOP],
@@ -44,15 +50,17 @@ export class GazeAnalyzer {
     // Average the two eyes
     const avgRatio = (leftRatio + rightRatio) / 2;
 
+    // Use provided thresholds or fallback to defaults
+    const upThreshold = thresholds?.upThreshold ?? 0.40;
+    const downThreshold = thresholds?.downThreshold ?? 0.60;
+    const centerThreshold = (upThreshold + downThreshold) / 2;
+
     // 3. Classify based on ratio
-    // The ratio is (iris_y - top_y) / (bottom_y - top_y). 
-    // Closer to 0 means looking UP. Closer to 1 means looking DOWN.
     let rawState = GazeState.CENTER;
     
-    // These thresholds can be fine-tuned or moved to a calibration phase later
-    if (avgRatio < 0.40) {
+    if (avgRatio < upThreshold) {
       rawState = GazeState.UP;
-    } else if (avgRatio > 0.60) {
+    } else if (avgRatio > downThreshold) {
       rawState = GazeState.DOWN;
     }
 
@@ -62,19 +70,22 @@ export class GazeAnalyzer {
     // 5. Calculate a mock confidence based on how extreme the ratio is
     let confidence = 0;
     if (smoothedState === GazeState.CENTER) {
-      // Confidence is highest when ratio is exactly 0.5
-      confidence = 100 - Math.abs(0.5 - avgRatio) * 200;
+      // Distance from center threshold
+      const maxDist = Math.max(downThreshold - centerThreshold, centerThreshold - upThreshold);
+      const dist = Math.abs(centerThreshold - avgRatio);
+      confidence = 100 - (dist / maxDist) * 100;
     } else if (smoothedState === GazeState.UP) {
-      // Confidence is highest when ratio is closer to 0
-      confidence = (0.40 - avgRatio) * 300; 
+      // Max range from upThreshold to say 0.2
+      confidence = ((upThreshold - avgRatio) / 0.15) * 100; 
     } else if (smoothedState === GazeState.DOWN) {
-      // Confidence is highest when ratio is closer to 1
-      confidence = (avgRatio - 0.60) * 300;
+      // Max range from downThreshold to say 0.8
+      confidence = ((avgRatio - downThreshold) / 0.15) * 100;
     }
 
     return {
       state: smoothedState,
-      confidence: Math.min(100, Math.max(0, Math.round(confidence)))
+      confidence: Math.min(100, Math.max(0, Math.round(confidence))),
+      rawRatio: avgRatio
     };
   }
 
