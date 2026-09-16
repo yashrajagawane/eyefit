@@ -21,6 +21,10 @@ export class Obstacle {
     this.x -= this.speed;
   }
   
+  public setSpeed(newSpeed: number) {
+    this.speed = newSpeed;
+  }
+  
   public isOffScreen(): boolean {
     return this.x + this.width < 0;
   }
@@ -50,11 +54,15 @@ export class Obstacle {
     const topHeight = this.gapCenterY - (this.gapSize / 2);
     const bottomY = this.gapCenterY + (this.gapSize / 2);
     
+    // Shrink hitbox slightly for a fairer feeling game (give the player ~3px of grace)
+    const graceMargin = 3;
+    const effectiveRadius = birdRadius - graceMargin;
+    
     // Check bounding box first
-    if (birdX + birdRadius > this.x && birdX - birdRadius < this.x + this.width) {
+    if (birdX + effectiveRadius > this.x && birdX - effectiveRadius < this.x + this.width) {
       // Inside horizontal bounds of pipe
       // Check if hitting top pipe or bottom pipe
-      if (birdY - birdRadius < topHeight || birdY + birdRadius > bottomY) {
+      if (birdY - effectiveRadius < topHeight || birdY + effectiveRadius > bottomY) {
         return true;
       }
     }

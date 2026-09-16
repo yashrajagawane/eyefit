@@ -26,6 +26,9 @@ export default function GameCanvas() {
       if (e.code === "Space") {
         e.preventDefault(); // Prevent page scrolling
         engine.input("FLAP");
+      } else if (e.code === "KeyP" || e.code === "Escape") {
+        e.preventDefault();
+        engine.input("PAUSE");
       }
     };
     
@@ -39,6 +42,10 @@ export default function GameCanvas() {
   
   return (
     <div className="relative w-full max-w-4xl aspect-video mx-auto rounded-2xl overflow-hidden border border-white/10 shadow-2xl neon-glow">
+      {/* 
+        The canvas uses a fixed internal resolution (1280x720) for consistent physics, 
+        and scales responsively using CSS w-full and aspect-video.
+      */}
       <canvas 
         ref={canvasRef}
         width={1280}
@@ -58,6 +65,13 @@ export default function GameCanvas() {
         <div className="absolute inset-0 bg-black/60 flex flex-col items-center justify-center pointer-events-none">
           <h2 className="text-4xl font-black text-white mb-4 tracking-wider neon-text-glow">READY?</h2>
           <p className="text-xl text-zinc-300 font-medium">Press SPACE to flap</p>
+        </div>
+      )}
+      
+      {gameState === GameState.PAUSED && (
+        <div className="absolute inset-0 bg-black/80 flex flex-col items-center justify-center pointer-events-none backdrop-blur-sm">
+          <h2 className="text-5xl font-black text-white mb-2 tracking-wider neon-text-glow">PAUSED</h2>
+          <p className="text-xl text-zinc-400">Press P or ESC to resume</p>
         </div>
       )}
       

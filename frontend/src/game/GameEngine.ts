@@ -1,9 +1,11 @@
 import { Bird } from "./Bird";
 import { Obstacle } from "./Obstacle";
+import { AudioSystem } from "./AudioSystem";
 
 export enum GameState {
   READY,
   PLAYING,
+  PAUSED,
   GAME_OVER
 }
 
@@ -12,6 +14,7 @@ type EventCallback = (state: GameState, score: number) => void;
 export class GameEngine {
   private canvas: HTMLCanvasElement;
   private ctx: CanvasRenderingContext2D;
+  private audio: AudioSystem;
   
   private bird!: Bird;
   private obstacles: Obstacle[] = [];
@@ -21,6 +24,8 @@ export class GameEngine {
   
   private animationFrameId: number = 0;
   private frames: number = 0;
+  private baseSpeed: number = 4;
+  private spawnInterval: number = 120;
   
   private onStateChange?: EventCallback;
   
@@ -28,6 +33,7 @@ export class GameEngine {
     this.canvas = canvas;
     this.ctx = canvas.getContext('2d')!;
     this.onStateChange = onStateChange;
+    this.audio = new AudioSystem();
     
     this.init();
   }
@@ -37,6 +43,8 @@ export class GameEngine {
     this.obstacles = [];
     this.score = 0;
     this.frames = 0;
+    this.baseSpeed = 4;
+    this.spawnInterval = 120;
     
     this.setState(GameState.READY);
     this.draw(); // Initial draw without animation
@@ -53,11 +61,22 @@ export class GameEngine {
     if (this.state === GameState.READY) {
       this.setState(GameState.PLAYING);
       this.bird.jump();
+      this.audio.playFlap();
       this.loop();
     } else if (this.state === GameState.GAME_OVER) {
       this.init();
       this.setState(GameState.PLAYING);
       this.bird.jump();
+      this.audio.playFlap();
+      this.loop();
+    }
+  }
+  
+  public togglePause() {
+    if (this.state === GameState.PLAYING) {
+      this.setState(GameState.PAUSED);
+    } else if (this.state === GameState.PAUSED) {
+      this.setState(GameState.PLAYING);
       this.loop();
     }
   }
@@ -66,11 +85,17 @@ export class GameEngine {
     cancelAnimationFrame(this.animationFrameId);
   }
   
-  public input(action: 'FLAP') {
+  public input(action: 'FLAP' | 'PAUSE') {
+    if (action === 'PAUSE') {
+      this.togglePause();
+      return;
+    }
+    
     if (this.state === GameState.READY || this.state === GameState.GAME_OVER) {
       this.start();
     } else if (this.state === GameState.PLAYING && action === 'FLAP') {
       this.bird.jump();
+      this.audio.playFlap();
     }
   }
   
@@ -84,57 +109,62 @@ export class GameEngine {
   }
   
   private spawnObstacle() {
-    // Leave safe margins at top and bottom (e.g. 100px)
     const margin = 100;
-    const minCenterY = margin + 90; // Half of gap size (180/2)
+    const minCenterY = margin + 90;
     const maxCenterY = this.canvas.height - margin - 90;
     
     const gapCenterY = Math.floor(Math.random() * (maxCenterY - minCenterY + 1)) + minCenterY;
     
-    // Dynamic difficulty could adjust gapSize here
-    this.obstacles.push(new Obstacle(this.canvas.width, gapCenterY));
+    const obs = new Obstacle(this.canvas.width, gapCenterY);
+    obs.setSpeed(this.baseSpeed);
+    this.obstacles.push(obs);
+  }
+  
+  private updateDifficulty() {
+    // Increase speed slightly every 5 points, maxing out at speed 8
+    this.baseSpeed = Math.min(8, 4 + Math.floor(this.score / 5) * 0.5);
+    // Decrease spawn interval as speed increases to keep pipes somewhat evenly spaced
+    this.spawnInterval = Math.max(60, 120 - Math.floor(this.score / 5) * 10);
   }
   
   private update() {
     this.frames++;
     this.bird.update(this.canvas.height);
     
-    // Spawn obstacles every 120 frames (approx 2 seconds at 60fps)
-    if (this.frames % 120 === 0) {
+    if (this.frames % this.spawnInterval === 0) {
       this.spawnObstacle();
     }
     
-    // Update obstacles and check collisions/score
     for (let i = this.obstacles.length - 1; i >= 0; i--) {
       const obs = this.obstacles[i];
+      obs.setSpeed(this.baseSpeed); // apply current difficulty speed
       obs.update();
       
-      // Collision with pipes
       if (obs.collidesWith(this.bird.x, this.bird.y, this.bird.radius)) {
         this.gameOver();
         return;
       }
       
-      // Scoring logic
       if (!obs.passed && this.bird.x > obs.x + obs.width) {
         obs.passed = true;
         this.score++;
+        this.updateDifficulty();
+        this.audio.playScore();
         if (this.onStateChange) this.onStateChange(this.state, this.score);
       }
       
-      // Cleanup off-screen obstacles
       if (obs.isOffScreen()) {
         this.obstacles.splice(i, 1);
       }
     }
     
-    // Floor collision = Game Over
     if (this.bird.y + this.bird.radius >= this.canvas.height) {
       this.gameOver();
     }
   }
   
   private gameOver() {
+    this.audio.playHit();
     this.setState(GameState.GAME_OVER);
   }
   
