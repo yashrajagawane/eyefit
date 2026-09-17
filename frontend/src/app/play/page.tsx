@@ -8,7 +8,9 @@ import { useCamera, CameraState } from "@/hooks/useCamera";
 import { useGaze } from "@/hooks/useGaze";
 import { useCalibration } from "@/hooks/useCalibration";
 import { usePose } from "@/hooks/usePose";
+import { usePushUp } from "@/hooks/usePushUp";
 import { GazeState } from "@/vision/gaze/GazeAnalyzer";
+import { PushUpState } from "@/vision/pose/PushUpAnalyzer"
 
 export default function PlayRoute() {
   const { stream, state: cameraState, errorMsg, startCamera, stopCamera } = useCamera();
@@ -29,6 +31,7 @@ export default function PlayRoute() {
 
   const { gazeResult, isVisionReady } = useGaze(videoRef, cameraState === CameraState.PLAYING, thresholds);
   const { poseResult, isPoseReady } = usePose(videoRef, cameraState === CameraState.PLAYING);
+  const { pushUpResult, resetReps } = usePushUp(poseResult.landmarks);
 
   // Sync the raw ratio so calibration hook can use it
   useEffect(() => {
@@ -51,7 +54,7 @@ export default function PlayRoute() {
         <div className="mb-6 flex justify-between items-end">
           <div>
             <h1 className="text-3xl font-bold">Eye Flap Mode</h1>
-            <p className="text-zinc-400">Phase 8: Pose Tracking</p>
+            <p className="text-zinc-400">Phase 9: Push-Up Rep Engine</p>
           </div>
           
           <div className="flex items-center gap-4">
@@ -156,6 +159,55 @@ export default function PlayRoute() {
                       Up: {thresholds.upThreshold.toFixed(2)} | Dn: {thresholds.downThreshold.toFixed(2)}
                     </div>
                   )}
+                </div>
+              )}
+
+              {/* Push-Up Rep Counter */}
+              {cameraState === CameraState.PLAYING && (
+                <div className="bg-zinc-900/90 border border-white/10 rounded-lg p-3 backdrop-blur-md">
+                  <div className="text-xs text-zinc-400 mb-2 font-semibold tracking-wider flex justify-between items-center">
+                    PUSH-UP COUNTER
+                    <button
+                      onClick={resetReps}
+                      className="text-[10px] text-zinc-500 hover:text-red-400 transition-colors"
+                      title="Reset rep count"
+                    >
+                      Reset
+                    </button>
+                  </div>
+
+                  {/* Big rep number */}
+                  <div className="text-center py-1">
+                    <span className="text-4xl font-black text-white">{pushUpResult.repCount}</span>
+                    <span className="text-zinc-500 text-xs ml-1">reps</span>
+                  </div>
+
+                  {/* State & angle */}
+                  <div className="flex justify-between items-center mt-1">
+                    <span className="text-sm">State:</span>
+                    <span className={`text-xs font-bold ${
+                      pushUpResult.state === PushUpState.BOTTOM ? 'text-red-400' :
+                      pushUpResult.state === PushUpState.MOVING_UP ? 'text-amber-400' :
+                      pushUpResult.state === PushUpState.MOVING_DOWN ? 'text-blue-400' :
+                      'text-green-400'
+                    }`}>
+                      {pushUpResult.state}
+                    </span>
+                  </div>
+                  <div className="flex justify-between items-center mt-1">
+                    <span className="text-sm">Angle:</span>
+                    <span className="font-medium text-white">{pushUpResult.elbowAngle}°</span>
+                  </div>
+
+                  {/* Tracking indicator */}
+                  <div className="mt-2 flex items-center gap-1.5">
+                    <div className={`w-1.5 h-1.5 rounded-full ${
+                      pushUpResult.isTracking ? 'bg-green-400' : 'bg-zinc-600'
+                    }`}/>
+                    <span className="text-[10px] text-zinc-500">
+                      {pushUpResult.isTracking ? 'Arms tracked' : 'Arms not visible'}
+                    </span>
+                  </div>
                 </div>
               )}
             </div>
