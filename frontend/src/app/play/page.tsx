@@ -10,7 +10,7 @@ import { useCalibration } from "@/hooks/useCalibration";
 import { usePose } from "@/hooks/usePose";
 import { usePushUp } from "@/hooks/usePushUp";
 import { GazeState } from "@/vision/gaze/GazeAnalyzer";
-import { PushUpState } from "@/vision/pose/PushUpAnalyzer"
+import { PushUpState, FormVerdict } from "@/vision/pose/PushUpAnalyzer"
 
 export default function PlayRoute() {
   const { stream, state: cameraState, errorMsg, startCamera, stopCamera } = useCamera();
@@ -54,7 +54,7 @@ export default function PlayRoute() {
         <div className="mb-6 flex justify-between items-end">
           <div>
             <h1 className="text-3xl font-bold">Eye Flap Mode</h1>
-            <p className="text-zinc-400">Phase 9: Push-Up Rep Engine</p>
+            <p className="text-zinc-400">Phase 10: Form Analysis</p>
           </div>
           
           <div className="flex items-center gap-4">
@@ -208,6 +208,27 @@ export default function PlayRoute() {
                       {pushUpResult.isTracking ? 'Arms tracked' : 'Arms not visible'}
                     </span>
                   </div>
+
+                  {/* Form verdict for last rep */}
+                  {pushUpResult.lastFormResult && (
+                    <div className="mt-2 border-t border-white/5 pt-2">
+                      <div className="text-[10px] text-zinc-500 mb-1">LAST REP</div>
+                      <div className={`text-xs font-bold px-2 py-1 rounded text-center ${
+                        pushUpResult.lastFormResult.verdict === FormVerdict.GOOD
+                          ? 'bg-green-500/20 text-green-400'
+                          : pushUpResult.lastFormResult.verdict === FormVerdict.TRACKING_ERROR
+                          ? 'bg-red-500/20 text-red-400'
+                          : pushUpResult.lastFormResult.verdict === FormVerdict.MISALIGNED
+                          ? 'bg-red-500/20 text-red-400'
+                          : 'bg-amber-500/20 text-amber-400'
+                      }`}>
+                        {pushUpResult.lastFormResult.verdict}
+                      </div>
+                      <p className="text-[10px] text-zinc-500 mt-1 leading-tight">
+                        {pushUpResult.lastFormResult.detail}
+                      </p>
+                    </div>
+                  )}
                 </div>
               )}
             </div>

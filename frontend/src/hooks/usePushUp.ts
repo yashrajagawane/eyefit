@@ -8,6 +8,7 @@ export function usePushUp(poseLandmarks: NormalizedLandmark[] | null) {
     repCount: 0,
     elbowAngle: 0,
     isTracking: false,
+    lastFormResult: null,
   });
 
   // Keep a single analyzer instance alive across renders
@@ -32,6 +33,7 @@ export function usePushUp(poseLandmarks: NormalizedLandmark[] | null) {
       repCount: 0,
       elbowAngle: 0,
       isTracking: false,
+      lastFormResult: null,
     });
   };
 
