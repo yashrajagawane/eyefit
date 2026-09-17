@@ -4,11 +4,19 @@ import React, { useEffect, useRef, useState } from "react";
 import { GameEngine, GameState } from "@/game/GameEngine";
 import { GazeState } from "@/vision/gaze/GazeAnalyzer";
 
+import { SessionMetrics } from "@/hooks/useSessionAnalytics";
+
 interface GameCanvasProps {
   gazeState?: GazeState;
+  onGameStateChange?: (state: GameState, score: number) => void;
+  sessionMetrics?: SessionMetrics | null;
 }
 
-export default function GameCanvas({ gazeState = GazeState.CENTER }: GameCanvasProps) {
+export default function GameCanvas({ 
+  gazeState = GazeState.CENTER,
+  onGameStateChange,
+  sessionMetrics
+}: GameCanvasProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const engineRef = useRef<GameEngine | null>(null);
   
@@ -22,6 +30,9 @@ export default function GameCanvas({ gazeState = GazeState.CENTER }: GameCanvasP
     const engine = new GameEngine(canvasRef.current, (state, newScore) => {
       setGameState(state);
       setScore(newScore);
+      if (onGameStateChange) {
+        onGameStateChange(state, newScore);
+      }
     });
     
     engineRef.current = engine;
@@ -94,10 +105,39 @@ export default function GameCanvas({ gazeState = GazeState.CENTER }: GameCanvasP
       )}
       
       {gameState === GameState.GAME_OVER && (
-        <div className="absolute inset-0 bg-black/80 flex flex-col items-center justify-center pointer-events-none">
+        <div className="absolute inset-0 bg-black/80 flex flex-col items-center justify-center pointer-events-none p-6">
           <h2 className="text-5xl font-black text-red-500 mb-2 tracking-wider neon-text-glow">GAME OVER</h2>
-          <p className="text-2xl text-white font-bold mb-6">Score: {score}</p>
-          <p className="text-lg text-zinc-400">Look UP or press SPACE to restart</p>
+          <p className="text-3xl text-white font-bold mb-6">Score: {score}</p>
+          
+          {sessionMetrics && (
+            <div className="bg-zinc-900/80 border border-white/10 rounded-xl p-4 mb-6 backdrop-blur-md min-w-[300px]">
+              <h3 className="text-zinc-400 text-xs font-bold tracking-widest mb-3 text-center">SESSION SUMMARY</h3>
+              
+              <div className="grid grid-cols-2 gap-4">
+                <div className="flex flex-col items-center p-2 bg-black/30 rounded-lg">
+                  <span className="text-2xl font-bold text-white">{sessionMetrics.totalReps}</span>
+                  <span className="text-[10px] text-zinc-500 uppercase tracking-wider mt-1">Total Reps</span>
+                </div>
+                
+                <div className="flex flex-col items-center p-2 bg-black/30 rounded-lg">
+                  <span className="text-2xl font-bold text-green-400">{sessionMetrics.validReps}</span>
+                  <span className="text-[10px] text-zinc-500 uppercase tracking-wider mt-1">Valid Reps</span>
+                </div>
+                
+                <div className="flex flex-col items-center p-2 bg-black/30 rounded-lg">
+                  <span className="text-2xl font-bold text-amber-400">{sessionMetrics.averageForm}</span>
+                  <span className="text-[10px] text-zinc-500 uppercase tracking-wider mt-1">Avg Form</span>
+                </div>
+                
+                <div className="flex flex-col items-center p-2 bg-black/30 rounded-lg">
+                  <span className="text-2xl font-bold text-blue-400">{sessionMetrics.durationSeconds}s</span>
+                  <span className="text-[10px] text-zinc-500 uppercase tracking-wider mt-1">Duration</span>
+                </div>
+              </div>
+            </div>
+          )}
+
+          <p className="text-lg text-zinc-400 mt-2">Look UP or press SPACE to restart</p>
         </div>
       )}
     </div>
