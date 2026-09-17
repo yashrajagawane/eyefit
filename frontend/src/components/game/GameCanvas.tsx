@@ -2,8 +2,13 @@
 
 import React, { useEffect, useRef, useState } from "react";
 import { GameEngine, GameState } from "@/game/GameEngine";
+import { GazeState } from "@/vision/gaze/GazeAnalyzer";
 
-export default function GameCanvas() {
+interface GameCanvasProps {
+  gazeState?: GazeState;
+}
+
+export default function GameCanvas({ gazeState = GazeState.CENTER }: GameCanvasProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const engineRef = useRef<GameEngine | null>(null);
   
@@ -40,6 +45,19 @@ export default function GameCanvas() {
     };
   }, []);
   
+  // Handle Gaze Input
+  const prevGazeState = useRef<GazeState>(gazeState);
+  
+  useEffect(() => {
+    if (engineRef.current) {
+      // Detect edge: transitioned from non-UP to UP
+      if (gazeState === GazeState.UP && prevGazeState.current !== GazeState.UP) {
+        engineRef.current.input("FLAP");
+      }
+    }
+    prevGazeState.current = gazeState;
+  }, [gazeState]);
+  
   return (
     <div className="relative w-full max-w-4xl aspect-video mx-auto rounded-2xl overflow-hidden border border-white/10 shadow-2xl neon-glow">
       {/* 
@@ -64,7 +82,7 @@ export default function GameCanvas() {
       {gameState === GameState.READY && (
         <div className="absolute inset-0 bg-black/60 flex flex-col items-center justify-center pointer-events-none">
           <h2 className="text-4xl font-black text-white mb-4 tracking-wider neon-text-glow">READY?</h2>
-          <p className="text-xl text-zinc-300 font-medium">Press SPACE to flap</p>
+          <p className="text-xl text-zinc-300 font-medium">Look UP or press SPACE to flap</p>
         </div>
       )}
       
@@ -79,7 +97,7 @@ export default function GameCanvas() {
         <div className="absolute inset-0 bg-black/80 flex flex-col items-center justify-center pointer-events-none">
           <h2 className="text-5xl font-black text-red-500 mb-2 tracking-wider neon-text-glow">GAME OVER</h2>
           <p className="text-2xl text-white font-bold mb-6">Score: {score}</p>
-          <p className="text-lg text-zinc-400">Press SPACE to restart</p>
+          <p className="text-lg text-zinc-400">Look UP or press SPACE to restart</p>
         </div>
       )}
     </div>

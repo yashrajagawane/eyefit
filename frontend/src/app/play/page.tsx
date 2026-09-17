@@ -49,7 +49,7 @@ export default function PlayRoute() {
         <div className="mb-6 flex justify-between items-end">
           <div>
             <h1 className="text-3xl font-bold">Eye Flap Mode</h1>
-            <p className="text-zinc-400">Phase 6: Gaze Calibration</p>
+            <p className="text-zinc-400">Phase 7: Eye-Controlled Game</p>
           </div>
           
           <div className="flex items-center gap-4">
@@ -101,7 +101,7 @@ export default function PlayRoute() {
         </div>
         
         <div className="relative">
-          <GameCanvas />
+          <GameCanvas gazeState={gazeResult.state} />
           
           {/* Picture-in-picture Camera Preview & Gaze Debug UI */}
           {(cameraState === CameraState.PLAYING || cameraState === CameraState.STARTING || cameraState === CameraState.ERROR) && (
@@ -152,7 +152,7 @@ export default function PlayRoute() {
         </div>
         
         <div className="mt-8 text-center text-zinc-500">
-          <p>Controls: Use SPACEBAR to flap. P or ESC to pause. (Gaze control coming in Phase 7)</p>
+          <p>Controls: Look UP or use SPACEBAR to flap. P or ESC to pause.</p>
         </div>
       </div>
     </div>
