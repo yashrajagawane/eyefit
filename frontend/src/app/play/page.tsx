@@ -7,6 +7,7 @@ import { GazeCalibration } from "@/components/calibration/GazeCalibration";
 import { useCamera, CameraState } from "@/hooks/useCamera";
 import { useGaze } from "@/hooks/useGaze";
 import { useCalibration } from "@/hooks/useCalibration";
+import { usePose } from "@/hooks/usePose";
 import { GazeState } from "@/vision/gaze/GazeAnalyzer";
 
 export default function PlayRoute() {
@@ -27,6 +28,7 @@ export default function PlayRoute() {
   } = useCalibration(currentRawRatio);
 
   const { gazeResult, isVisionReady } = useGaze(videoRef, cameraState === CameraState.PLAYING, thresholds);
+  const { poseResult, isPoseReady } = usePose(videoRef, cameraState === CameraState.PLAYING);
 
   // Sync the raw ratio so calibration hook can use it
   useEffect(() => {
@@ -49,16 +51,24 @@ export default function PlayRoute() {
         <div className="mb-6 flex justify-between items-end">
           <div>
             <h1 className="text-3xl font-bold">Eye Flap Mode</h1>
-            <p className="text-zinc-400">Phase 7: Eye-Controlled Game</p>
+            <p className="text-zinc-400">Phase 8: Pose Tracking</p>
           </div>
           
           <div className="flex items-center gap-4">
             {isVisionReady ? (
-              <span className="text-green-400 text-sm font-medium">CV Model Loaded</span>
+              <span className="text-green-400 text-sm font-medium">Gaze ✓</span>
             ) : (
               <span className="text-amber-400 text-sm font-medium flex items-center gap-2">
                 <div className="w-3 h-3 border-2 border-amber-400 border-t-transparent rounded-full animate-spin"></div>
-                Loading CV...
+                Loading Gaze...
+              </span>
+            )}
+            {isPoseReady ? (
+              <span className="text-green-400 text-sm font-medium">Pose ✓</span>
+            ) : (
+              <span className="text-amber-400 text-sm font-medium flex items-center gap-2">
+                <div className="w-3 h-3 border-2 border-amber-400 border-t-transparent rounded-full animate-spin"></div>
+                Loading Pose...
               </span>
             )}
 
@@ -110,7 +120,8 @@ export default function PlayRoute() {
                 ref={videoRef}
                 stream={stream} 
                 state={cameraState} 
-                errorMsg={errorMsg} 
+                errorMsg={errorMsg}
+                poseLandmarks={poseResult.landmarks ?? undefined}
               />
               
               {/* Gaze Debug Overlay */}
