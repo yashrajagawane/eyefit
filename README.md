@@ -18,4 +18,4 @@ This is a monorepo containing:
 - `frontend/`: Next.js web application (React, TypeScript, Tailwind CSS)
 - `backend/`: FastAPI application (Python)
 
-See the respective directories for their own setup and run instructions.
+See the respective directories for their own setup and run instructions.   
