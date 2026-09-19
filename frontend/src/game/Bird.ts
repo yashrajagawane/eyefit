@@ -1,6 +1,8 @@
 export class Bird {
   public y: number;
   public velocity: number;
+  public shields: number = 0;
+  public invincibilityFrames: number = 0;
   
   public readonly x: number = 100;
   public readonly radius: number = 15;
@@ -14,6 +16,22 @@ export class Bird {
     this.y = startY;
     this.velocity = 0;
   }
+
+  public addShield(): void {
+    this.shields += 1;
+  }
+
+  /** Consume one shield and start the invincibility window (60 frames ≈ 1s). */
+  public consumeShield(): void {
+    if (this.shields > 0) {
+      this.shields -= 1;
+      this.invincibilityFrames = 90; // ~1.5 seconds at 60fps
+    }
+  }
+
+  public get isInvincible(): boolean {
+    return this.invincibilityFrames > 0;
+  }
   
   public update(canvasHeight: number) {
     this.frames++;
@@ -25,6 +43,11 @@ export class Bird {
     }
     
     this.y += this.velocity;
+    
+    // Tick down invincibility
+    if (this.invincibilityFrames > 0) {
+      this.invincibilityFrames--;
+    }
     
     // Floor collision (basic logic, engine will handle Game Over state)
     if (this.y + this.radius >= canvasHeight) {
@@ -48,11 +71,32 @@ export class Bird {
     ctx.translate(this.x, this.y);
     
     // Calculate tilt angle based on velocity
-    // When velocity is negative (going up), tilt up. When positive (going down), tilt down.
     let rotation = (this.velocity * 4) * (Math.PI / 180);
-    // Cap rotation between -20 and 90 degrees
     rotation = Math.max(-20 * (Math.PI / 180), Math.min(90 * (Math.PI / 180), rotation));
     ctx.rotate(rotation);
+
+    // Shield aura — drawn beneath the bird
+    if (this.shields > 0 || this.isInvincible) {
+      // Flash during invincibility (every 6 frames)
+      const showAura = this.isInvincible ? (this.invincibilityFrames % 12 < 6) : true;
+      if (showAura) {
+        const auraRadius = this.radius + 8;
+        const gradient = ctx.createRadialGradient(0, 0, this.radius, 0, 0, auraRadius + 4);
+        gradient.addColorStop(0, 'rgba(34, 211, 238, 0.5)');  // cyan-400
+        gradient.addColorStop(1, 'rgba(34, 211, 238, 0)');
+        ctx.beginPath();
+        ctx.arc(0, 0, auraRadius + 4, 0, Math.PI * 2);
+        ctx.fillStyle = gradient;
+        ctx.fill();
+
+        // Solid shield ring
+        ctx.beginPath();
+        ctx.arc(0, 0, auraRadius, 0, Math.PI * 2);
+        ctx.strokeStyle = 'rgba(34, 211, 238, 0.9)';
+        ctx.lineWidth = 2;
+        ctx.stroke();
+      }
+    }
     
     // Draw body
     ctx.beginPath();
@@ -64,7 +108,7 @@ export class Bird {
     ctx.stroke();
     
     // Draw wing (animated)
-    const wingY = Math.sin(this.frames * 0.5) * 4; // Flapping motion
+    const wingY = Math.sin(this.frames * 0.5) * 4;
     ctx.beginPath();
     ctx.ellipse(-4, wingY, 6, 3, 0, 0, Math.PI * 2);
     ctx.fillStyle = 'rgba(255, 255, 255, 0.4)';

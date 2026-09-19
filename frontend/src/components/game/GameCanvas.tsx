@@ -8,12 +8,14 @@ import { SessionMetrics } from "@/hooks/useSessionAnalytics";
 
 interface GameCanvasProps {
   gazeState?: GazeState;
+  pushUpRepCount?: number;
   onGameStateChange?: (state: GameState, score: number) => void;
   sessionMetrics?: SessionMetrics | null;
 }
 
 export default function GameCanvas({ 
   gazeState = GazeState.CENTER,
+  pushUpRepCount = 0,
   onGameStateChange,
   sessionMetrics
 }: GameCanvasProps) {
@@ -22,14 +24,16 @@ export default function GameCanvas({
   
   const [gameState, setGameState] = useState<GameState>(GameState.READY);
   const [score, setScore] = useState<number>(0);
+  const [shields, setShields] = useState<number>(0);
   
   useEffect(() => {
     if (!canvasRef.current) return;
     
     // Initialize game engine
-    const engine = new GameEngine(canvasRef.current, (state, newScore) => {
+    const engine = new GameEngine(canvasRef.current, (state, newScore, newShields) => {
       setGameState(state);
       setScore(newScore);
+      setShields(newShields);
       if (onGameStateChange) {
         onGameStateChange(state, newScore);
       }
@@ -61,13 +65,21 @@ export default function GameCanvas({
   
   useEffect(() => {
     if (engineRef.current) {
-      // Detect edge: transitioned from non-UP to UP
       if (gazeState === GazeState.UP && prevGazeState.current !== GazeState.UP) {
         engineRef.current.input("FLAP");
       }
     }
     prevGazeState.current = gazeState;
   }, [gazeState]);
+
+  // Grant a shield when a new push-up rep is completed
+  const prevRepCountRef = useRef<number>(0);
+  useEffect(() => {
+    if (pushUpRepCount > prevRepCountRef.current) {
+      engineRef.current?.addShield();
+    }
+    prevRepCountRef.current = pushUpRepCount;
+  }, [pushUpRepCount]);
   
   return (
     <div className="relative w-full max-w-4xl aspect-video mx-auto rounded-2xl overflow-hidden border border-white/10 shadow-2xl neon-glow">
@@ -87,6 +99,13 @@ export default function GameCanvas({
         <div className="text-3xl font-black text-white neon-text-glow">
           {score}
         </div>
+        {/* Shield indicator */}
+        {shields > 0 && gameState === GameState.PLAYING && (
+          <div className="flex items-center gap-1.5 bg-cyan-500/20 border border-cyan-400/50 rounded-full px-3 py-1">
+            <span className="text-cyan-400 text-lg">🛡️</span>
+            <span className="text-cyan-300 font-bold text-sm">{shields}</span>
+          </div>
+        )}
       </div>
       
       {/* State Overlays */}

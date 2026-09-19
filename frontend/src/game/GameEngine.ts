@@ -9,7 +9,7 @@ export enum GameState {
   GAME_OVER
 }
 
-type EventCallback = (state: GameState, score: number) => void;
+type EventCallback = (state: GameState, score: number, shields: number) => void;
 
 export class GameEngine {
   private canvas: HTMLCanvasElement;
@@ -53,7 +53,7 @@ export class GameEngine {
   private setState(newState: GameState) {
     this.state = newState;
     if (this.onStateChange) {
-      this.onStateChange(this.state, this.score);
+      this.onStateChange(this.state, this.score, this.bird?.shields ?? 0);
     }
   }
   
@@ -96,6 +96,17 @@ export class GameEngine {
     } else if (this.state === GameState.PLAYING && action === 'FLAP') {
       this.bird.jump();
       this.audio.playFlap();
+    }
+  }
+
+  /** Grant the bird one shield. Called externally when a push-up rep is completed. */
+  public addShield(): void {
+    if (this.state === GameState.PLAYING) {
+      this.bird.addShield();
+      // Fire state change so HUD updates shield count
+      if (this.onStateChange) {
+        this.onStateChange(this.state, this.score, this.bird.shields);
+      }
     }
   }
   
@@ -141,8 +152,17 @@ export class GameEngine {
       obs.update();
       
       if (obs.collidesWith(this.bird.x, this.bird.y, this.bird.radius)) {
-        this.gameOver();
-        return;
+        if (!this.bird.isInvincible) {
+          if (this.bird.shields > 0) {
+            // Consume a shield instead of dying
+            this.bird.consumeShield();
+            this.audio.playFlap(); // reuse a sound as a shield-break sound
+            if (this.onStateChange) this.onStateChange(this.state, this.score, this.bird.shields);
+          } else {
+            this.gameOver();
+            return;
+          }
+        }
       }
       
       if (!obs.passed && this.bird.x > obs.x + obs.width) {
@@ -150,7 +170,7 @@ export class GameEngine {
         this.score++;
         this.updateDifficulty();
         this.audio.playScore();
-        if (this.onStateChange) this.onStateChange(this.state, this.score);
+        if (this.onStateChange) this.onStateChange(this.state, this.score, this.bird.shields);
       }
       
       if (obs.isOffScreen()) {

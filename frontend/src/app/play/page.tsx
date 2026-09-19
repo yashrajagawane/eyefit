@@ -66,7 +66,7 @@ export default function PlayRoute() {
         <div className="mb-6 flex justify-between items-end">
           <div>
             <h1 className="text-3xl font-bold">Eye Flap Mode</h1>
-            <p className="text-zinc-400">Phase 11: Session Analytics</p>
+            <p className="text-zinc-400">Phase 13: Fitness/Game Integration</p>
           </div>
           
           <div className="flex items-center gap-4">
@@ -127,7 +127,8 @@ export default function PlayRoute() {
         
         <div className="relative">
           <GameCanvas 
-            gazeState={gazeResult.state} 
+            gazeState={gazeResult.state}
+            pushUpRepCount={pushUpResult.repCount}
             onGameStateChange={(state, score) => {
               setInternalGameState(state);
               setInternalGameScore(score);
