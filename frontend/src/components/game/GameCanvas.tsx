@@ -113,25 +113,35 @@ export default function GameCanvas({
             <div className="bg-zinc-900/80 border border-white/10 rounded-xl p-4 mb-6 backdrop-blur-md min-w-[300px]">
               <h3 className="text-zinc-400 text-xs font-bold tracking-widest mb-3 text-center">SESSION SUMMARY</h3>
               
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-3 gap-3">
                 <div className="flex flex-col items-center p-2 bg-black/30 rounded-lg">
-                  <span className="text-2xl font-bold text-white">{sessionMetrics.totalReps}</span>
-                  <span className="text-[10px] text-zinc-500 uppercase tracking-wider mt-1">Total Reps</span>
+                  <span className="text-xl font-bold text-white">{sessionMetrics.totalReps}</span>
+                  <span className="text-[9px] text-zinc-500 uppercase tracking-wider mt-1 text-center">Total Reps</span>
                 </div>
                 
                 <div className="flex flex-col items-center p-2 bg-black/30 rounded-lg">
-                  <span className="text-2xl font-bold text-green-400">{sessionMetrics.validReps}</span>
-                  <span className="text-[10px] text-zinc-500 uppercase tracking-wider mt-1">Valid Reps</span>
+                  <span className="text-xl font-bold text-green-400">{sessionMetrics.validReps}</span>
+                  <span className="text-[9px] text-zinc-500 uppercase tracking-wider mt-1 text-center">Valid Reps</span>
                 </div>
                 
                 <div className="flex flex-col items-center p-2 bg-black/30 rounded-lg">
-                  <span className="text-2xl font-bold text-amber-400">{sessionMetrics.averageForm}</span>
-                  <span className="text-[10px] text-zinc-500 uppercase tracking-wider mt-1">Avg Form</span>
+                  <span className="text-xl font-bold text-blue-400">{sessionMetrics.durationSeconds}s</span>
+                  <span className="text-[9px] text-zinc-500 uppercase tracking-wider mt-1 text-center">Duration</span>
                 </div>
                 
                 <div className="flex flex-col items-center p-2 bg-black/30 rounded-lg">
-                  <span className="text-2xl font-bold text-blue-400">{sessionMetrics.durationSeconds}s</span>
-                  <span className="text-[10px] text-zinc-500 uppercase tracking-wider mt-1">Duration</span>
+                  <span className="text-xl font-bold text-amber-400">{sessionMetrics.averageForm}</span>
+                  <span className="text-[9px] text-zinc-500 uppercase tracking-wider mt-1 text-center">Avg Form</span>
+                </div>
+
+                <div className="flex flex-col items-center p-2 bg-black/30 rounded-lg">
+                  <span className={`text-xl font-bold ${sessionMetrics.performanceScore >= 80 ? 'text-green-400' : sessionMetrics.performanceScore >= 50 ? 'text-amber-400' : 'text-red-400'}`}>{sessionMetrics.performanceScore}</span>
+                  <span className="text-[9px] text-zinc-500 uppercase tracking-wider mt-1 text-center">Performance</span>
+                </div>
+
+                <div className="flex flex-col items-center p-2 bg-black/30 rounded-lg">
+                  <span className={`text-xl font-bold ${sessionMetrics.fatigueIndicator >= 80 ? 'text-red-400' : sessionMetrics.fatigueIndicator >= 50 ? 'text-amber-400' : 'text-blue-400'}`}>{sessionMetrics.fatigueIndicator}</span>
+                  <span className="text-[9px] text-zinc-500 uppercase tracking-wider mt-1 text-center">Fatigue</span>
                 </div>
               </div>
             </div>

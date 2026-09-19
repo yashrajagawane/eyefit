@@ -17,6 +17,12 @@ export interface FormResult {
   detail: string;
   /** Numeric score 0–100 for future analytics use. */
   score: number;
+  /** Duration of the rep in milliseconds. */
+  repDurationMs: number;
+  /** The lowest elbow angle achieved during the rep. */
+  minElbowAngle: number;
+  /** The highest elbow angle achieved during the rep. */
+  maxElbowAngle: number;
 }
 
 // --- Rep State Machine ---
@@ -91,12 +97,14 @@ export class PushUpAnalyzer {
   private maxElbowAngle: number = 0;     // Highest angle seen (extension check)
   private minBodyAlignment: number = 180; // Lowest body line angle (alignment check)
   private hadTrackingGap: boolean = false;
+  private currentRepStartTime: number = 0;
 
   public reset(): void {
     this.state = PushUpState.UP;
     this.repCount = 0;
     this.lastRepTimestamp = 0;
     this.lastFormResult = null;
+    this.currentRepStartTime = 0;
     this.resetRepTracking();
   }
 
@@ -107,14 +115,22 @@ export class PushUpAnalyzer {
     this.hadTrackingGap = false;
   }
 
-  private evaluateForm(): FormResult {
+  private evaluateForm(now: number): FormResult {
+    const repDurationMs = this.currentRepStartTime > 0 ? now - this.currentRepStartTime : 0;
+    const baseResult = {
+      repDurationMs,
+      minElbowAngle: this.minElbowAngle,
+      maxElbowAngle: this.maxElbowAngle,
+    };
+
     if (this.hadTrackingGap) {
-      return { verdict: FormVerdict.TRACKING_ERROR, detail: "Tracking lost mid-rep", score: 0 };
+      return { ...baseResult, verdict: FormVerdict.TRACKING_ERROR, detail: "Tracking lost mid-rep", score: 0 };
     }
 
     // Check depth first (most common issue)
     if (this.minElbowAngle > DEPTH_GOOD) {
       return {
+        ...baseResult,
         verdict: FormVerdict.SHALLOW,
         detail: `Go deeper — bottom angle was ${Math.round(this.minElbowAngle)}° (target ≤${DEPTH_GOOD}°)`,
         score: Math.max(0, Math.round(100 - (this.minElbowAngle - DEPTH_GOOD) * 3)),
@@ -124,6 +140,7 @@ export class PushUpAnalyzer {
     // Check full extension at top
     if (this.maxElbowAngle < EXTENSION_GOOD) {
       return {
+        ...baseResult,
         verdict: FormVerdict.INCOMPLETE,
         detail: `Extend fully at top — reached ${Math.round(this.maxElbowAngle)}° (target ≥${EXTENSION_GOOD}°)`,
         score: Math.max(0, Math.round(100 - (EXTENSION_GOOD - this.maxElbowAngle) * 3)),
@@ -133,13 +150,14 @@ export class PushUpAnalyzer {
     // Check body alignment (only penalise if hips/ankles were visible)
     if (this.minBodyAlignment < ALIGNMENT_GOOD && this.minBodyAlignment > 0) {
       return {
+        ...baseResult,
         verdict: FormVerdict.MISALIGNED,
         detail: `Keep body straight — alignment was ${Math.round(this.minBodyAlignment)}° (target ≥${ALIGNMENT_GOOD}°)`,
         score: Math.max(0, Math.round(100 - (ALIGNMENT_GOOD - this.minBodyAlignment) * 2)),
       };
     }
 
-    return { verdict: FormVerdict.GOOD, detail: "Great rep!", score: 100 };
+    return { ...baseResult, verdict: FormVerdict.GOOD, detail: "Great rep!", score: 100 };
   }
 
   public analyze(landmarks: NormalizedLandmark[]): PushUpResult {
@@ -195,6 +213,7 @@ export class PushUpAnalyzer {
       case PushUpState.UP:
         if (avgAngle < DOWN_THRESHOLD) {
           this.resetRepTracking();
+          this.currentRepStartTime = now;
           this.state = PushUpState.MOVING_DOWN;
         }
         break;
@@ -219,7 +238,7 @@ export class PushUpAnalyzer {
           if (now - this.lastRepTimestamp > REP_DEBOUNCE_MS) {
             this.repCount += 1;
             this.lastRepTimestamp = now;
-            this.lastFormResult = this.evaluateForm();
+            this.lastFormResult = this.evaluateForm(now);
           }
           this.state = PushUpState.UP;
         }
