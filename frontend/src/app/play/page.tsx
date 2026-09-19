@@ -10,7 +10,8 @@ import { useCalibration } from "@/hooks/useCalibration";
 import { usePose } from "@/hooks/usePose";
 import { usePushUp } from "@/hooks/usePushUp";
 import { useSessionAnalytics } from "@/hooks/useSessionAnalytics";
-import { GameState } from "@/game/GameEngine";
+import { useDifficultyEngine } from "@/hooks/useDifficultyEngine";
+import { GameState, GameEngine } from "@/game/GameEngine";
 import { GazeState } from "@/vision/gaze/GazeAnalyzer";
 import { PushUpState, FormVerdict } from "@/vision/pose/PushUpAnalyzer"
 
@@ -35,14 +36,23 @@ export default function PlayRoute() {
   const { poseResult, isPoseReady } = usePose(videoRef, cameraState === CameraState.PLAYING);
   const { pushUpResult, resetReps } = usePushUp(poseResult.landmarks);
   
-  // Game state lifted from GameCanvas to feed analytics
+  // Game state lifted from GameCanvas to feed analytics + difficulty
   const [internalGameState, setInternalGameState] = useState<GameState>(GameState.READY);
   const [internalGameScore, setInternalGameScore] = useState<number>(0);
+  const gameEngineRef = useRef<GameEngine | null>(null);
   
   const { sessionMetrics } = useSessionAnalytics(
     internalGameState,
     internalGameScore,
     pushUpResult
+  );
+
+  const { difficultyLevel } = useDifficultyEngine(
+    gameEngineRef,
+    gazeResult.state,
+    pushUpResult,
+    internalGameState,
+    internalGameScore
   );
 
   // Sync the raw ratio so calibration hook can use it
@@ -66,7 +76,7 @@ export default function PlayRoute() {
         <div className="mb-6 flex justify-between items-end">
           <div>
             <h1 className="text-3xl font-bold">Eye Flap Mode</h1>
-            <p className="text-zinc-400">Phase 13: Fitness/Game Integration</p>
+            <p className="text-zinc-400">Phase 14: Adaptive Difficulty</p>
           </div>
           
           <div className="flex items-center gap-4">
@@ -129,10 +139,11 @@ export default function PlayRoute() {
           <GameCanvas 
             gazeState={gazeResult.state}
             pushUpRepCount={pushUpResult.repCount}
+            difficultyLevel={difficultyLevel}
+            onEngineReady={(engine) => { gameEngineRef.current = engine; }}
             onGameStateChange={(state, score) => {
               setInternalGameState(state);
               setInternalGameScore(score);
-              // Reset reps when transitioning from READY or GAME_OVER to PLAYING
               if (state === GameState.PLAYING && internalGameState !== GameState.PLAYING && internalGameState !== GameState.PAUSED) {
                 resetReps();
               }

@@ -5,18 +5,23 @@ import { GameEngine, GameState } from "@/game/GameEngine";
 import { GazeState } from "@/vision/gaze/GazeAnalyzer";
 
 import { SessionMetrics } from "@/hooks/useSessionAnalytics";
+import { DifficultyLevel } from "@/game/DifficultyEngine";
 
 interface GameCanvasProps {
   gazeState?: GazeState;
   pushUpRepCount?: number;
+  difficultyLevel?: DifficultyLevel;
   onGameStateChange?: (state: GameState, score: number) => void;
+  onEngineReady?: (engine: GameEngine) => void;
   sessionMetrics?: SessionMetrics | null;
 }
 
 export default function GameCanvas({ 
   gazeState = GazeState.CENTER,
   pushUpRepCount = 0,
+  difficultyLevel = 'NORMAL',
   onGameStateChange,
+  onEngineReady,
   sessionMetrics
 }: GameCanvasProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -29,15 +34,19 @@ export default function GameCanvas({
   useEffect(() => {
     if (!canvasRef.current) return;
     
-    // Initialize game engine
-    const engine = new GameEngine(canvasRef.current, (state, newScore, newShields) => {
-      setGameState(state);
-      setScore(newScore);
-      setShields(newShields);
-      if (onGameStateChange) {
-        onGameStateChange(state, newScore);
-      }
-    });
+    // Initialize game engine (3rd arg fires once when engine is ready)
+    const engine = new GameEngine(
+      canvasRef.current,
+      (state, newScore, newShields) => {
+        setGameState(state);
+        setScore(newScore);
+        setShields(newShields);
+        if (onGameStateChange) {
+          onGameStateChange(state, newScore);
+        }
+      },
+      onEngineReady
+    );
     
     engineRef.current = engine;
     
@@ -94,18 +103,31 @@ export default function GameCanvas({
         className="w-full h-full object-cover"
       />
       
-      {/* HUD Overlays */}
+      {/* HUD Overlays — score (left), difficulty + shields (right) */}
       <div className="absolute top-0 left-0 w-full p-6 flex justify-between items-start pointer-events-none">
         <div className="text-3xl font-black text-white neon-text-glow">
           {score}
         </div>
-        {/* Shield indicator */}
-        {shields > 0 && gameState === GameState.PLAYING && (
-          <div className="flex items-center gap-1.5 bg-cyan-500/20 border border-cyan-400/50 rounded-full px-3 py-1">
-            <span className="text-cyan-400 text-lg">🛡️</span>
-            <span className="text-cyan-300 font-bold text-sm">{shields}</span>
-          </div>
-        )}
+        <div className="flex items-center gap-2">
+          {/* Difficulty badge */}
+          {gameState === GameState.PLAYING && (
+            <div className={`text-[10px] font-bold px-2 py-0.5 rounded-full border ${
+              difficultyLevel === 'EXTREME' ? 'bg-red-500/20 border-red-400/50 text-red-300' :
+              difficultyLevel === 'HARD'    ? 'bg-orange-500/20 border-orange-400/50 text-orange-300' :
+              difficultyLevel === 'EASY'    ? 'bg-blue-500/20 border-blue-400/50 text-blue-300' :
+                                             'bg-zinc-500/20 border-zinc-400/30 text-zinc-400'
+            } tracking-widest`}>
+              {difficultyLevel}
+            </div>
+          )}
+          {/* Shield indicator */}
+          {shields > 0 && gameState === GameState.PLAYING && (
+            <div className="flex items-center gap-1.5 bg-cyan-500/20 border border-cyan-400/50 rounded-full px-3 py-1">
+              <span className="text-cyan-400 text-lg">🛡️</span>
+              <span className="text-cyan-300 font-bold text-sm">{shields}</span>
+            </div>
+          )}
+        </div>
       </div>
       
       {/* State Overlays */}

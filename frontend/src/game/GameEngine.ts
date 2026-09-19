@@ -10,6 +10,7 @@ export enum GameState {
 }
 
 type EventCallback = (state: GameState, score: number, shields: number) => void;
+type EngineReadyCallback = (engine: GameEngine) => void;
 
 export class GameEngine {
   private canvas: HTMLCanvasElement;
@@ -26,16 +27,25 @@ export class GameEngine {
   private frames: number = 0;
   private baseSpeed: number = 4;
   private spawnInterval: number = 120;
+  private difficultyModifier: number = 1.0;
+
+  // For collision rate calculation
+  private obstaclesPassed: number = 0;
+  private collisionsTotal: number = 0;
   
   private onStateChange?: EventCallback;
+  private onEngineReady?: EngineReadyCallback;
   
-  constructor(canvas: HTMLCanvasElement, onStateChange?: EventCallback) {
+  constructor(canvas: HTMLCanvasElement, onStateChange?: EventCallback, onEngineReady?: EngineReadyCallback) {
     this.canvas = canvas;
     this.ctx = canvas.getContext('2d')!;
     this.onStateChange = onStateChange;
+    this.onEngineReady = onEngineReady;
     this.audio = new AudioSystem();
     
     this.init();
+    // Notify parent that engine is ready for external control
+    if (this.onEngineReady) this.onEngineReady(this);
   }
   
   private init() {
@@ -45,9 +55,11 @@ export class GameEngine {
     this.frames = 0;
     this.baseSpeed = 4;
     this.spawnInterval = 120;
+    this.obstaclesPassed = 0;
+    this.collisionsTotal = 0;
     
     this.setState(GameState.READY);
-    this.draw(); // Initial draw without animation
+    this.draw();
   }
   
   private setState(newState: GameState) {
@@ -131,11 +143,22 @@ export class GameEngine {
     this.obstacles.push(obs);
   }
   
+  /** Returns the ratio of collisions to total obstacles encountered (0–1). */
+  public getCollisionRate(): number {
+    const total = this.obstaclesPassed + this.collisionsTotal;
+    return total === 0 ? 0 : this.collisionsTotal / total;
+  }
+
+  /** Called by the external DifficultyEngine to set a modifier on base speed. */
+  public setDifficultyModifier(modifier: number): void {
+    this.difficultyModifier = Math.max(0.6, Math.min(1.5, modifier));
+  }
+
   private updateDifficulty() {
-    // Increase speed slightly every 5 points, maxing out at speed 8
-    this.baseSpeed = Math.min(8, 4 + Math.floor(this.score / 5) * 0.5);
-    // Decrease spawn interval as speed increases to keep pipes somewhat evenly spaced
-    this.spawnInterval = Math.max(60, 120 - Math.floor(this.score / 5) * 10);
+    // Score-based progression × external difficulty modifier
+    const scoreBase = 4 + Math.floor(this.score / 5) * 0.5;
+    this.baseSpeed = Math.min(10, scoreBase * this.difficultyModifier);
+    this.spawnInterval = Math.max(50, 120 - Math.floor(this.score / 5) * 10);
   }
   
   private update() {
@@ -153,10 +176,10 @@ export class GameEngine {
       
       if (obs.collidesWith(this.bird.x, this.bird.y, this.bird.radius)) {
         if (!this.bird.isInvincible) {
+          this.collisionsTotal++;
           if (this.bird.shields > 0) {
-            // Consume a shield instead of dying
             this.bird.consumeShield();
-            this.audio.playFlap(); // reuse a sound as a shield-break sound
+            this.audio.playFlap();
             if (this.onStateChange) this.onStateChange(this.state, this.score, this.bird.shields);
           } else {
             this.gameOver();
@@ -168,6 +191,7 @@ export class GameEngine {
       if (!obs.passed && this.bird.x > obs.x + obs.width) {
         obs.passed = true;
         this.score++;
+        this.obstaclesPassed++;
         this.updateDifficulty();
         this.audio.playScore();
         if (this.onStateChange) this.onStateChange(this.state, this.score, this.bird.shields);
