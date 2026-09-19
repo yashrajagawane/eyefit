@@ -21,6 +21,9 @@ export function Navbar() {
         <Link href="/challenges" className="text-sm font-medium hover:text-primary transition-colors">
           Challenges
         </Link>
+        <Link href="/leaderboard" className="text-sm font-medium hover:text-primary transition-colors">
+          Leaderboard
+        </Link>
         {user ? (
           <>
             <Link href="/dashboard" className="text-sm font-medium hover:text-primary transition-colors">

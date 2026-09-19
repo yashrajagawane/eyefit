@@ -64,12 +64,14 @@ export default function PlayRoute() {
     setCurrentRawRatio(gazeResult.rawRatio);
   }, [gazeResult.rawRatio]);
 
+  const [gamificationResult, setGamificationResult] = useState<any>(null);
+
   // Save session when game is over
   useEffect(() => {
     if (internalGameState === GameState.GAME_OVER && user && sessionMetrics) {
       const saveSession = async () => {
         try {
-          await fetchWithAuth("/sessions", {
+          const res = await fetchWithAuth("/sessions", {
             method: "POST",
             body: JSON.stringify({
               duration_seconds: sessionMetrics.durationSeconds,
@@ -82,6 +84,7 @@ export default function PlayRoute() {
             })
           });
           console.log("Session saved successfully");
+          setGamificationResult(res);
         } catch (error) {
           console.error("Failed to save session:", error);
         }
@@ -175,10 +178,41 @@ export default function PlayRoute() {
               setInternalGameScore(score);
               if (state === GameState.PLAYING && internalGameState !== GameState.PLAYING && internalGameState !== GameState.PAUSED) {
                 resetReps();
+                setGamificationResult(null); // Reset overlay on restart
               }
             }}
             sessionMetrics={sessionMetrics}
           />
+
+          {/* Gamification Overlay */}
+          {gamificationResult && internalGameState === GameState.GAME_OVER && (
+            <div className="absolute inset-0 z-10 flex flex-col items-center justify-center bg-black/80 backdrop-blur-sm pointer-events-none p-4 text-center">
+              <h2 className="text-4xl font-black neon-text-glow text-white mb-2">+{gamificationResult.xp_earned} XP</h2>
+              
+              {gamificationResult.leveled_up && (
+                <div className="mt-4 p-4 bg-primary/20 border border-primary/50 rounded-xl animate-bounce">
+                  <div className="text-2xl">⭐</div>
+                  <div className="text-xl font-bold text-primary">Level Up!</div>
+                  <div className="text-white font-bold">You are now Level {gamificationResult.level}</div>
+                </div>
+              )}
+
+              {gamificationResult.unlocked_achievements && gamificationResult.unlocked_achievements.length > 0 && (
+                <div className="mt-6 flex flex-wrap gap-4 justify-center">
+                  {gamificationResult.unlocked_achievements.map((ach: string) => {
+                    const info = require("@/lib/gamification").getAchievementInfo(ach);
+                    return (
+                      <div key={ach} className="flex flex-col items-center bg-white/10 p-3 rounded-lg border border-white/20">
+                        <span className="text-3xl mb-1">{info.icon}</span>
+                        <span className="font-bold text-white text-sm">{info.name}</span>
+                        <span className="text-xs text-yellow-400 font-bold uppercase tracking-wider">Unlocked!</span>
+                      </div>
+                    );
+                  })}
+                </div>
+              )}
+            </div>
+          )}
           
           {/* Picture-in-picture Camera Preview & Gaze Debug UI */}
           {(cameraState === CameraState.PLAYING || cameraState === CameraState.STARTING || cameraState === CameraState.ERROR) && (

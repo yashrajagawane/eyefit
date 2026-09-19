@@ -21,6 +21,13 @@ class SessionResponse(SessionCreate):
     id: int
     created_at: datetime
     
+    # Optional fields returned only when creating a session
+    xp_earned: int | None = None
+    new_total_xp: int | None = None
+    level: int | None = None
+    leveled_up: bool | None = None
+    unlocked_achievements: List[str] | None = None
+
     class Config:
         from_attributes = True
 
@@ -31,6 +38,8 @@ def create_session(
     current_user: User = Depends(get_current_user)
 ) -> Any:
     """Save a completed game session for the current user."""
+    from app.services.gamification import calculate_xp, update_streak, check_achievements, award_xp
+    
     db_session = GameSession(
         user_id=current_user.id,
         **session_in.model_dump()
@@ -38,7 +47,26 @@ def create_session(
     db.add(db_session)
     db.commit()
     db.refresh(db_session)
-    return db_session
+    
+    # Check for PR (simplistic: highest game score)
+    best_score_session = db.query(GameSession).filter(
+        GameSession.user_id == current_user.id,
+        GameSession.id != db_session.id
+    ).order_by(GameSession.game_score.desc()).first()
+    
+    is_new_pr = best_score_session is None or db_session.game_score > best_score_session.game_score
+    
+    # Gamification
+    is_streak_day = update_streak(current_user.id, db)
+    xp_to_award = calculate_xp(db_session, is_streak_day, is_new_pr)
+    xp_res = award_xp(current_user.id, xp_to_award, db)
+    unlocked = check_achievements(current_user.id, db_session, db)
+    
+    response_data = db_session.__dict__.copy()
+    response_data.update(xp_res)
+    response_data["unlocked_achievements"] = unlocked
+    
+    return response_data
 
 @router.get("", response_model=List[SessionResponse])
 def get_sessions(

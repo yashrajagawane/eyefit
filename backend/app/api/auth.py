@@ -18,6 +18,9 @@ class UserResponse(BaseModel):
     id: int
     username: str
     email: str
+    xp: int = 0
+    level: int = 1
+    achievements: list[str] = []
     
     class Config:
         from_attributes = True
@@ -58,4 +61,14 @@ def login(db: Session = Depends(get_db), form_data: OAuth2PasswordRequestForm = 
 
 @router.get("/me", response_model=UserResponse)
 def read_users_me(current_user: User = Depends(get_current_user)) -> Any:
-    return current_user
+    # We already have the current_user, but we need to fetch their progress and achievements
+    response = UserResponse.model_validate(current_user)
+    
+    if current_user.progress:
+        response.xp = current_user.progress.xp
+        response.level = current_user.progress.level
+    
+    if current_user.achievements:
+        response.achievements = [a.achievement_id for a in current_user.achievements]
+        
+    return response

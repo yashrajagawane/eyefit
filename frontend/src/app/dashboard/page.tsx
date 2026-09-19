@@ -5,6 +5,7 @@ import Link from "next/link";
 import { Card } from "@/components/ui/Card";
 import { useAuth } from "@/context/AuthContext";
 import { fetchWithAuth } from "@/lib/api";
+import { xpProgress, ACHIEVEMENTS } from "@/lib/gamification";
 
 interface Session {
   id: number;
@@ -118,21 +119,48 @@ export default function Dashboard() {
 
   return (
     <div className="flex-1 w-full max-w-5xl mx-auto p-6 md:p-12">
-      {/* Header */}
+      {/* Header & Progress */}
       <header className="flex justify-between items-center mb-10">
-        <div>
-          <h1 className="text-3xl font-black neon-text-glow text-white tracking-wider uppercase">
+        <div className="flex-1">
+          <h1 className="text-3xl font-black neon-text-glow text-white tracking-wider uppercase mb-2">
             Dashboard
           </h1>
-          {user && (
-            <p className="text-zinc-400 mt-1">
-              Welcome back, <span className="text-cyan-400 font-bold">{user.username}</span> 👋
-            </p>
+          {user ? (
+            <div className="max-w-md">
+              <div className="flex justify-between items-end mb-1">
+                <p className="text-zinc-400">
+                  Welcome back, <span className="text-cyan-400 font-bold">{user.username}</span> 👋
+                </p>
+                <div className="text-sm font-bold text-primary">
+                  Level {user.level}
+                </div>
+              </div>
+              
+              {/* Live XP Bar */}
+              <div className="bg-white/5 rounded-full h-3 w-full border border-white/10 relative overflow-hidden">
+                {(() => {
+                  const { pct, currentXp, nextLvlXp } = xpProgress(user.xp);
+                  return (
+                    <>
+                      <div
+                        className="bg-gradient-to-r from-primary to-accent h-3 rounded-full transition-all duration-1000"
+                        style={{ width: `${pct}%` }}
+                      />
+                      <div className="absolute inset-0 flex items-center justify-center text-[10px] font-bold text-white drop-shadow-md">
+                        {currentXp} / {nextLvlXp} XP
+                      </div>
+                    </>
+                  );
+                })()}
+              </div>
+            </div>
+          ) : (
+             <p className="text-zinc-400 mt-1">Sign in to track your progress.</p>
           )}
         </div>
         <Link
           href="/play"
-          className="inline-flex h-12 px-6 items-center justify-center rounded-full bg-primary text-primary-foreground font-bold hover:bg-accent transition-all neon-glow text-sm tracking-widest"
+          className="inline-flex h-12 px-6 items-center justify-center rounded-full bg-primary text-primary-foreground font-bold hover:bg-accent transition-all neon-glow text-sm tracking-widest ml-4"
         >
           ▶ PLAY NOW
         </Link>
@@ -195,6 +223,25 @@ export default function Dashboard() {
           )}
         </Card>
       </div>
+
+      {/* Achievements (only if logged in) */}
+      {user && (
+        <div className="mb-10">
+          <h2 className="text-xl font-bold text-white mb-4">Achievements</h2>
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+            {ACHIEVEMENTS.map((a: any) => {
+              const unlocked = user.achievements.includes(a.id);
+              return (
+                <Card key={a.id} className={`flex flex-col items-center text-center p-4 transition-all ${unlocked ? 'border-primary/50 bg-primary/10' : 'opacity-50 grayscale border-white/5'}`}>
+                  <div className="text-4xl mb-2">{a.icon}</div>
+                  <div className="font-bold text-white">{a.name}</div>
+                  <div className="text-xs text-zinc-400 mt-1">{a.description}</div>
+                </Card>
+              );
+            })}
+          </div>
+        </div>
+      )}
 
       {/* Recent sessions */}
       <div>

@@ -13,7 +13,30 @@ class User(Base):
     created_at = Column(DateTime, default=datetime.datetime.utcnow)
 
     sessions = relationship("GameSession", back_populates="user")
-    # Future: achievements, progress, etc.
+    progress = relationship("UserProgress", back_populates="user", uselist=False)
+    achievements = relationship("Achievement", back_populates="user")
+
+class UserProgress(Base):
+    __tablename__ = "user_progress"
+
+    id = Column(Integer, primary_key=True, index=True)
+    user_id = Column(Integer, ForeignKey("users.id"), unique=True, nullable=False)
+    xp = Column(Integer, default=0, nullable=False)
+    level = Column(Integer, default=1, nullable=False)
+    streak = Column(Integer, default=0, nullable=False)
+    last_session_date = Column(DateTime, nullable=True)
+
+    user = relationship("User", back_populates="progress")
+
+class Achievement(Base):
+    __tablename__ = "achievements"
+
+    id = Column(Integer, primary_key=True, index=True)
+    user_id = Column(Integer, ForeignKey("users.id"), nullable=False)
+    achievement_id = Column(String, index=True, nullable=False)
+    unlocked_at = Column(DateTime, default=datetime.datetime.utcnow)
+
+    user = relationship("User", back_populates="achievements")
 
 class GameSession(Base):
     __tablename__ = "sessions"

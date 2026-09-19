@@ -7,6 +7,9 @@ export interface User {
   id: number;
   username: string;
   email: string;
+  xp: number;
+  level: number;
+  achievements: string[];
 }
 
 interface AuthContextType {
