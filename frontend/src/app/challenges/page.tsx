@@ -7,30 +7,35 @@ const MODES = [
     title: "👀 EYE FLAP",
     desc: "Control the bird with your gaze.",
     btn: "PLAY",
-    href: "/results?mode=eye-flap" // Mocks the flow
+    href: "/play",
+    active: true,
   },
   {
     id: "push-up",
     title: "💪 PUSH-UP",
     desc: "Test your form.",
-    btn: "START",
-    href: "/results?mode=push-up"
+    btn: "COMING SOON",
+    href: null,
+    active: false,
   },
   {
     id: "eyefit",
     title: "🔥 EYEFIT",
-    desc: "Game + Workout.",
-    btn: "CHALLENGE",
-    href: "/results?mode=eyefit"
+    desc: "Game + Workout — gaze controls the bird, push-ups grant shields.",
+    btn: "PLAY",
+    href: "/play",
+    active: true,
   },
   {
     id: "endurance",
     title: "⏱️ ENDURANCE",
     desc: "No fixed rep target.",
-    btn: "START",
-    href: "/results?mode=endurance"
+    btn: "COMING SOON",
+    href: null,
+    active: false,
   }
 ];
+
 
 export default function Challenges() {
   return (
@@ -39,18 +44,25 @@ export default function Challenges() {
       
       <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
         {MODES.map((mode) => (
-          <Card key={mode.id} glow className="flex flex-col h-full border border-primary/20 hover:border-primary/60 transition-colors group">
+          <Card key={mode.id} glow className={`flex flex-col h-full border transition-colors group ${mode.active ? 'border-primary/20 hover:border-primary/60' : 'border-white/5 opacity-60'}`}>
             <h2 className="text-2xl font-bold mb-4">{mode.title}</h2>
             <p className="text-zinc-400 mb-8 flex-1">{mode.desc}</p>
-            <Link 
-              href={mode.href}
-              className="w-full flex h-12 items-center justify-center rounded-lg bg-white/5 border border-white/10 group-hover:bg-primary group-hover:text-primary-foreground group-hover:border-primary transition-all font-bold tracking-wider"
-            >
-              {mode.btn}
-            </Link>
+            {mode.active && mode.href ? (
+              <Link 
+                href={mode.href}
+                className="w-full flex h-12 items-center justify-center rounded-lg bg-white/5 border border-white/10 group-hover:bg-primary group-hover:text-primary-foreground group-hover:border-primary transition-all font-bold tracking-wider"
+              >
+                {mode.btn}
+              </Link>
+            ) : (
+              <div className="w-full flex h-12 items-center justify-center rounded-lg bg-white/5 border border-white/5 text-zinc-600 font-bold tracking-wider cursor-not-allowed">
+                {mode.btn}
+              </div>
+            )}
           </Card>
         ))}
       </div>
     </div>
   );
 }
+

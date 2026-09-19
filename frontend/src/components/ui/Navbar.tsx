@@ -23,6 +23,9 @@ export function Navbar() {
         </Link>
         {user ? (
           <>
+            <Link href="/dashboard" className="text-sm font-medium hover:text-primary transition-colors">
+              Dashboard
+            </Link>
             <Link href="/history" className="text-sm font-medium hover:text-primary transition-colors">
               History
             </Link>
