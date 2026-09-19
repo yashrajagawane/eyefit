@@ -1,5 +1,6 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from app.api import auth, sessions
 
 app = FastAPI(
     title="EyeFit API",
@@ -24,3 +25,6 @@ app.add_middleware(
 @app.get("/api/health")
 def health_check():
     return {"status": "ok", "message": "EyeFit API is running"}
+
+app.include_router(auth.router, prefix="/api/auth", tags=["Authentication"])
+app.include_router(sessions.router, prefix="/api/sessions", tags=["Sessions"])

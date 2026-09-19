@@ -11,6 +11,8 @@ import { usePose } from "@/hooks/usePose";
 import { usePushUp } from "@/hooks/usePushUp";
 import { useSessionAnalytics } from "@/hooks/useSessionAnalytics";
 import { useDifficultyEngine } from "@/hooks/useDifficultyEngine";
+import { useAuth } from "@/context/AuthContext";
+import { fetchWithAuth } from "@/lib/api";
 import { GameState, GameEngine } from "@/game/GameEngine";
 import { GazeState } from "@/vision/gaze/GazeAnalyzer";
 import { PushUpState, FormVerdict } from "@/vision/pose/PushUpAnalyzer"
@@ -35,6 +37,7 @@ export default function PlayRoute() {
   const { gazeResult, isVisionReady } = useGaze(videoRef, cameraState === CameraState.PLAYING, thresholds);
   const { poseResult, isPoseReady } = usePose(videoRef, cameraState === CameraState.PLAYING);
   const { pushUpResult, resetReps } = usePushUp(poseResult.landmarks);
+  const { user } = useAuth();
   
   // Game state lifted from GameCanvas to feed analytics + difficulty
   const [internalGameState, setInternalGameState] = useState<GameState>(GameState.READY);
@@ -60,6 +63,32 @@ export default function PlayRoute() {
     // eslint-disable-next-line react-hooks/set-state-in-effect
     setCurrentRawRatio(gazeResult.rawRatio);
   }, [gazeResult.rawRatio]);
+
+  // Save session when game is over
+  useEffect(() => {
+    if (internalGameState === GameState.GAME_OVER && user && sessionMetrics) {
+      const saveSession = async () => {
+        try {
+          await fetchWithAuth("/sessions", {
+            method: "POST",
+            body: JSON.stringify({
+              duration_seconds: sessionMetrics.durationSeconds,
+              game_score: sessionMetrics.gameScore,
+              total_reps: sessionMetrics.totalReps,
+              valid_reps: sessionMetrics.validReps,
+              average_form: sessionMetrics.averageForm,
+              performance_score: sessionMetrics.performanceScore,
+              fatigue_indicator: sessionMetrics.fatigueIndicator
+            })
+          });
+          console.log("Session saved successfully");
+        } catch (error) {
+          console.error("Failed to save session:", error);
+        }
+      };
+      saveSession();
+    }
+  }, [internalGameState, user, sessionMetrics]);
 
   return (
     <div className="flex-1 w-full flex flex-col items-center justify-center p-6 bg-[#09090b]">
