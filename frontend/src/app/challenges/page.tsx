@@ -13,10 +13,10 @@ const MODES = [
   {
     id: "push-up",
     title: "💪 PUSH-UP",
-    desc: "Test your form.",
-    btn: "COMING SOON",
-    href: null,
-    active: false,
+    desc: "Test your form. Pure endurance.",
+    btn: "START",
+    href: "/push-up",
+    active: true,
   },
   {
     id: "eyefit",
