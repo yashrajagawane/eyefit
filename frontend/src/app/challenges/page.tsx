@@ -29,10 +29,10 @@ const MODES = [
   {
     id: "endurance",
     title: "⏱️ ENDURANCE",
-    desc: "No fixed rep target.",
-    btn: "COMING SOON",
-    href: null,
-    active: false,
+    desc: "Survive until the timer ends. No fixed rep target.",
+    btn: "START",
+    href: "/endurance",
+    active: true,
   }
 ];
 
