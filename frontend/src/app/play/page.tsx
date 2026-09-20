@@ -1,6 +1,7 @@
 "use client";
 
 import { useRef, useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
 import GameCanvas from "@/components/game/GameCanvas";
 import { CameraPreview } from "@/components/camera/CameraPreview";
 import { GazeCalibration } from "@/components/calibration/GazeCalibration";
@@ -18,6 +19,7 @@ import { GazeState } from "@/vision/gaze/GazeAnalyzer";
 import { PushUpState, FormVerdict } from "@/vision/pose/PushUpAnalyzer"
 
 export default function PlayRoute() {
+  const router = useRouter();
   const { stream, state: cameraState, errorMsg, startCamera, stopCamera } = useCamera();
   const videoRef = useRef<HTMLVideoElement>(null);
   
@@ -96,10 +98,15 @@ export default function PlayRoute() {
               fatigue_indicator: sessionMetrics.fatigueIndicator
             })
           });
-          console.log("Session saved successfully");
+          // Persist session result to localStorage for the Results page
+          localStorage.setItem('eyefit_last_session', JSON.stringify(res));
           setGamificationResult(res);
+          // Navigate to the Results page after a short moment so the XP
+          // animation is visible first
+          setTimeout(() => router.push('/results'), 2200);
         } catch (error) {
           console.error("Failed to save session:", error);
+          setGamificationResult({ error: true });
         }
       };
       saveSession();
@@ -120,8 +127,8 @@ export default function PlayRoute() {
       <div className="w-full max-w-5xl">
         <div className="mb-6 flex justify-between items-end">
           <div>
-            <h1 className="text-3xl font-bold">Eye Flap Mode</h1>
-            <p className="text-zinc-400">Phase 14: Adaptive Difficulty</p>
+            <h1 className="text-3xl font-bold">EyeFit Challenge</h1>
+            <p className="text-zinc-400">Gaze + Push-Ups → Adaptive Difficulty</p>
           </div>
           
           <div className="flex items-center gap-4">
