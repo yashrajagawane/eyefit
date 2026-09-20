@@ -53,18 +53,23 @@ export function usePose(
     }
 
     const video = videoRef.current;
+    let lastRenderTime = 0;
 
     const processFrame = () => {
       if (video.videoWidth > 0 && video.readyState >= 2) {
         const timestampMs = performance.now();
         const landmarks = poseTrackerRef.current?.detectPose(video, timestampMs);
 
-        if (landmarks) {
-          setPoseResult({ landmarks, isPoseDetected: true });
-        } else {
-          setPoseResult((prev) =>
-            prev.isPoseDetected ? { landmarks: null, isPoseDetected: false } : prev
-          );
+        // Throttle React state updates to ~30 FPS (33ms) to save CPU/battery
+        if (timestampMs - lastRenderTime > 33) {
+          if (landmarks) {
+            setPoseResult({ landmarks, isPoseDetected: true });
+          } else {
+            setPoseResult((prev) =>
+              prev.isPoseDetected ? { landmarks: null, isPoseDetected: false } : prev
+            );
+          }
+          lastRenderTime = timestampMs;
         }
       }
 

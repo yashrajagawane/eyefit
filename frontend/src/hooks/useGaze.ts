@@ -48,6 +48,8 @@ export function useGaze(
     }
 
     const video = videoRef.current;
+    let lastRenderTime = 0;
+    let lastState = GazeState.CENTER;
     
     const processFrame = () => {
       // Make sure video has valid dimensions and is playing
@@ -57,9 +59,14 @@ export function useGaze(
         
         if (landmarks && gazeAnalyzerRef.current) {
           const result = gazeAnalyzerRef.current.analyze(landmarks, thresholds);
-          // Only trigger a re-render if the state actually changes or we want continuous confidence updates
-          // For now, we update it continuously so the debug UI shows live confidence
-          setGazeResult(result);
+          
+          // Optimization: Only trigger React state update if the actual gaze state changed
+          // OR if 100ms have passed (to keep the debug UI semi-live without killing 60fps).
+          if (result.state !== lastState || timestampMs - lastRenderTime > 100) {
+            setGazeResult(result);
+            lastRenderTime = timestampMs;
+            lastState = result.state;
+          }
         }
       }
       
