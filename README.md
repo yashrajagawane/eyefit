@@ -1,74 +1,546 @@
 <div align="center">
-  <h1>👀 EyeFit</h1>
-  <p><strong>Vision-Based Gamified Fitness & Endurance System</strong></p>
-  
-  [![Next.js](https://img.shields.io/badge/Next.js-15-black)](https://nextjs.org/)
-  [![FastAPI](https://img.shields.io/badge/FastAPI-0.115-009688)](https://fastapi.tiangolo.com/)
-  [![MediaPipe](https://img.shields.io/badge/Google-MediaPipe-blue)](https://developers.google.com/mediapipe)
-  [![Docker](https://img.shields.io/badge/Docker-Supported-2496ED)](https://www.docker.com/)
+
+# 👀 EyeFit
+
+### *Your eyes control the game. Your body controls the challenge.*
+
+A browser-based fitness gaming platform powered by on-device computer vision — no hardware required.
+
+[![Next.js](https://img.shields.io/badge/Next.js-16-black?logo=next.js)](https://nextjs.org/)
+[![React](https://img.shields.io/badge/React-19-61DAFB?logo=react)](https://react.dev/)
+[![TypeScript](https://img.shields.io/badge/TypeScript-5-3178C6?logo=typescript)](https://www.typescriptlang.org/)
+[![FastAPI](https://img.shields.io/badge/FastAPI-0.100+-009688?logo=fastapi)](https://fastapi.tiangolo.com/)
+[![Python](https://img.shields.io/badge/Python-3.11-3776AB?logo=python)](https://www.python.org/)
+[![MediaPipe](https://img.shields.io/badge/Google-MediaPipe-4285F4?logo=google)](https://developers.google.com/mediapipe)
+[![Docker](https://img.shields.io/badge/Docker-Supported-2496ED?logo=docker)](https://www.docker.com/)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow)](LICENSE)
+
 </div>
 
-<br />
+---
 
-EyeFit is a web-based fitness application that merges computer vision, gaming, and exercise. It tracks your gaze to control a game character (like Flappy Bird) while simultaneously analyzing your physical push-up form using your device's webcam—all running locally in your browser.
+## Overview
 
-> **Privacy First**: All computer vision processing happens locally on your device via WebAssembly. No video or image data is ever recorded or sent to any server.
+EyeFit is a computer-vision-powered fitness gaming platform that runs entirely in the browser. It combines gaze-controlled gameplay with real-time exercise monitoring using only a standard webcam.
 
-## ✨ Features
+The user controls a Flappy Bird-style game character by looking **UP** or **DOWN**, while a pose estimation system simultaneously detects push-ups, evaluates exercise form, tracks fatigue, and produces a combined fitness-game score. Post-session, an AI-powered coach provides personalized feedback based on structured performance metrics.
 
-- **👀 Gaze Tracking Control**: Play a Flappy Bird-style game entirely hands-free by looking UP or DOWN. Features personalized calibration for accuracy.
-- **💪 Push-Up Form Engine**: Real-time skeletal tracking counts your push-ups, monitors elbow angles, and evaluates your form (e.g., "Good", "Shallow", "Incomplete").
-- **🎮 Unified Gamification**: Your physical exercise directly influences the game. Doing perfect push-ups grants you shields in the game.
-- **📈 Progression System**: Earn XP, level up, unlock achievements, and maintain daily streaks based on your workout performance.
-- **🤖 AI Coach**: Powered by Google Gemini, receive personalized, post-workout feedback analyzing your form and fatigue levels to suggest your next workout target.
+**Privacy first:** All computer vision inference runs locally via WebAssembly. No video, images, or raw camera frames are ever transmitted to any server.
 
-## 🏗️ Architecture Stack
+---
 
-- **Frontend**: Next.js 15 (React), TypeScript, Tailwind CSS
-- **Vision Models**: Google MediaPipe Tasks Vision (`FaceLandmarker`, `PoseLandmarker`)
-- **Backend API**: FastAPI (Python), SQLAlchemy, SQLite
-- **AI Integration**: Google GenAI SDK (Gemini)
+## Problem Statement
 
-## 🚀 Quick Start (Docker)
+Most fitness applications focus on exercise logging, while most casual games focus on entertainment. These are almost always separate experiences.
 
-The easiest way to run EyeFit is via Docker Compose.
+Home workouts also lack real-time form correction, personalized feedback, and the kind of engagement that keeps users coming back. High-quality interactive exergames (VR headsets, Kinect) require expensive specialized hardware that most users don't own.
 
-1. **Clone the repository**
-   ```bash
-   git clone https://github.com/yourusername/eyefit.git
-   cd eyefit
-   ```
+EyeFit bridges this gap by delivering:
 
-2. **Configure Environment Variables**
-   ```bash
-   cp backend/.env.example backend/.env
-   ```
-   *Edit `backend/.env` to include your `GEMINI_API_KEY` if you want the AI Coach feature to work.*
+- Interactive, physically demanding gameplay requiring only a webcam
+- Real-time form analysis and fatigue estimation
+- Adaptive difficulty that responds to your actual performance
+- Gamification (XP, levels, achievements, streaks) that rewards consistent effort
 
-3. **Start the containers**
-   ```bash
-   docker-compose up --build
-   ```
+---
 
-4. **Play!**
-   Open your browser and navigate to [http://localhost:3000](http://localhost:3000).
+## Features
 
-## 💻 Local Development Setup
+### ✅ Implemented
 
-If you prefer to run the frontend and backend separately for development, please refer to the detailed [Setup Guide](docs/05_Setup_Guide.md).
+| Feature | Description |
+|---|---|
+| 👀 **Gaze-Controlled Gameplay** | Control the game bird by looking UP/CENTER/DOWN — no keyboard needed |
+| 🎯 **Gaze Calibration** | Personalized calibration UI adapts to each user's eye shape and camera distance |
+| 💪 **Push-Up Detection** | Real-time skeletal landmark tracking via MediaPipe PoseLandmarker |
+| 📐 **Form Analysis** | Elbow angle calculation grades each rep as GOOD, SHALLOW, or TRACKING ERROR |
+| 🎮 **Flappy Bird Game Engine** | Custom `requestAnimationFrame` physics loop running at 60 FPS, decoupled from React |
+| 🧠 **Adaptive Difficulty** | Game speed and obstacle spacing adjusts based on gaze stability and fitness performance |
+| 📊 **Session Analytics** | Per-session metrics: duration, valid reps, form score, fatigue indicator, performance score |
+| 🏆 **Gamification** | XP, levels, achievements, and daily streaks stored in the backend |
+| 🤖 **AI Fitness Coach** | Google Gemini generates post-session feedback from structured metrics (not raw video) |
+| 🔐 **User Authentication** | JWT-based login and registration with rate limiting and bcrypt password hashing |
+| 📈 **Dashboard** | Personal stats, session history, XP/level display, and recent session cards |
+| 🏅 **Leaderboard** | Global leaderboard backed by API endpoint |
+| 🔒 **Security Hardening** | HTTP security headers, CSP, CORS restrictions, input validation on all API models |
+| 🐳 **Docker Deployment** | Multi-stage frontend Dockerfile + backend Dockerfile + `docker-compose.yml` |
+| 🧪 **Automated Tests** | Backend `pytest` suite (auth + gamification); frontend `vitest` suite (gamification logic) |
 
-## 📚 Documentation
+### 🚧 In Progress / Partially Active
 
-Dive deeper into how EyeFit is built:
+| Feature | Status |
+|---|---|
+| Push-Up Challenge Mode | UI card exists on `/challenges`. Core engine is complete; standalone mode not yet wired up |
+| Endurance Mode | UI card exists. Metrics engine is complete; dedicated flow not yet connected |
 
-1. [Development Roadmap & Phases](docs/03_Phases.md)
-2. [System Architecture](docs/04_Architecture.md)
-3. [Computer Vision & Algorithms](docs/06_Computer_Vision.md)
+### 🔮 Planned
 
-## 🤝 Contributing
+| Feature |
+|---|
+| Squat / Sit-up / Plank tracking |
+| WebRTC real-time multiplayer |
+| Advanced ML-based fatigue modelling |
+| Mobile layout optimization |
+| Friend leaderboards & social features |
 
-Contributions, issues, and feature requests are welcome! 
+---
 
-## 📝 License
+## How EyeFit Works
 
-This project is licensed under the MIT License.
+### 1. Eye & Gaze Tracking
+
+EyeFit uses the Google MediaPipe `FaceLandmarker` task to extract **478 3D facial landmarks** in real time.
+
+The gaze analyzer (`GazeAnalyzer.ts`) calculates the vertical position of the iris center relative to the upper and lower eyelid landmarks. This produces a **normalized pitch ratio** — when the iris is significantly closer to the upper eyelid, the system classifies gaze as `UP`; when it drifts toward the lower eyelid, `DOWN`.
+
+Because eye shapes differ significantly across users, a **Calibration UI** prompts the user to look CENTER, UP, and DOWN. It averages these ratios over multiple frames to establish personalized `upThreshold` and `downThreshold` values that are persisted in `localStorage`.
+
+```
+Gaze UP   → upward impulse applied to the bird
+Gaze CENTER → normal physics
+Gaze DOWN → downward influence on the bird
+UNKNOWN  → maintain last stable state
+```
+
+Temporal smoothing and a confidence threshold prevent control jitter from brief tracking inconsistencies.
+
+### 2. Push-Up Detection & Form Analysis
+
+EyeFit uses the MediaPipe `PoseLandmarker` task to track **33 skeletal landmarks** per frame.
+
+The push-up engine (`PushUpAnalyzer.ts`) isolates the Shoulder, Elbow, and Wrist landmarks and calculates the true 3D interior elbow angle using the **Law of Cosines**:
+
+```
+angle = arccos( (AB² + BC² - AC²) / (2 · |AB| · |BC|) )
+```
+
+This angle feeds into a **Finite State Machine**:
+
+```
+UP (angle > 150°)
+  ↓
+MOVING_DOWN
+  ↓
+BOTTOM (angle < 90°) ← required for a valid rep
+  ↓
+MOVING_UP
+  ↓
+UP → ✅ Valid Rep Counted
+```
+
+**Form verdicts per rep:**
+
+| Verdict | Condition |
+|---|---|
+| `GOOD` | Full depth reached (< 90° elbow), body alignment acceptable |
+| `SHALLOW` | Reversed direction before reaching 90° threshold |
+| `MISALIGNED` | Hip/shoulder plane deviation detected |
+| `TRACKING_ERROR` | Landmarks lost mid-repetition |
+
+### 3. The Game Engine
+
+The physics loop (`GameEngine.ts`) uses `requestAnimationFrame` and runs **entirely outside of React state**. This prevents the browser from choking on virtual DOM re-renders while trying to maintain 60 FPS collision physics.
+
+The custom React hooks (`useGaze`, `usePose`) throttle their state updates to **~30 FPS** for the HUD, while the game loop consumes the raw gaze state directly via callback.
+
+```
+requestAnimationFrame loop (60 FPS)
+    ├─ Bird physics & gravity
+    ├─ Obstacle generation & collision
+    ├─ Score increment
+    └─ onStateChange() → React UI (30 FPS max)
+```
+
+### 4. Fitness Analytics & Fatigue Estimation
+
+The `useSessionAnalytics` hook accumulates per-rep data throughout the session to produce:
+
+| Metric | Description |
+|---|---|
+| `valid_reps` | Reps that passed the full state machine |
+| `average_form` | Mean form score across all reps (0–100) |
+| `fatigue_indicator` | Estimated from trends in rep duration and form degradation (0–100) |
+| `performance_score` | Combined game and fitness composite score (0–100) |
+| `duration_seconds` | Total active session time |
+
+> ⚠️ **Disclaimer:** Fatigue and performance values are **estimated performance indicators** based on measurable movement signals, not medical measurements.
+
+---
+
+## Architecture
+
+```mermaid
+graph TD
+    subgraph Browser["Browser (Client)"]
+        UI["Next.js React UI"]
+        GL["GameEngine.ts\n(60 FPS rAF loop)"]
+        GZ["useGaze Hook\nFaceLandmarker"]
+        PS["usePose Hook\nPoseLandmarker"]
+        UI -->|state sync| GL
+        GZ -->|gaze state| GL
+        PS -->|push-up reps| UI
+    end
+
+    subgraph Backend["Backend (FastAPI)"]
+        API["REST API"]
+        SVC["Services\n(Auth, Gamification)"]
+        DB[("SQLite / PostgreSQL")]
+        AI["Google Gemini\nGenAI SDK"]
+        API --> SVC
+        SVC --> DB
+        SVC --> AI
+    end
+
+    Browser <-->|"HTTPS JSON\n(session save, auth)"| Backend
+```
+
+**Key design decisions:**
+
+- **Game loop decoupling:** The physics engine bypasses React to hit 60 FPS consistently on mid-range hardware.
+- **CV throttling:** MediaPipe runs at full native speed. React state updates are throttled to 30 FPS to prevent unnecessary re-renders without affecting gameplay.
+- **Stateless backend:** The API has no knowledge of the current game session; all real-time state lives in the browser.
+
+---
+
+## Tech Stack
+
+### Frontend
+
+| Technology | Version | Purpose |
+|---|---|---|
+| Next.js | 16 | App framework, routing, SSR |
+| React | 19 | UI component layer |
+| TypeScript | 5 | Type safety |
+| Tailwind CSS | 4 | Styling |
+| `@mediapipe/tasks-vision` | ^1.0.1 | Face & pose landmark detection (WASM) |
+| Vitest | ^5 | Unit testing |
+
+### Backend
+
+| Technology | Version | Purpose |
+|---|---|---|
+| FastAPI | ^0.100 | REST API framework |
+| Python | 3.11 | Runtime |
+| SQLAlchemy | ^2.0 | ORM |
+| Pydantic | ^2.0 | Data validation |
+| `python-jose` | ^3.3 | JWT authentication |
+| `passlib[bcrypt]` | ^1.7 | Password hashing |
+| `google-genai` | ^0.2 | Gemini API integration |
+| `slowapi` | ^0.1.9 | API rate limiting |
+| `alembic` | ^1.11 | Database migrations |
+| SQLite / PostgreSQL | — | Data persistence |
+| pytest + httpx | — | Backend testing |
+
+### Infrastructure
+
+| Tool | Purpose |
+|---|---|
+| Docker | Containerization |
+| Docker Compose | Multi-service orchestration |
+| Node.js 18 Alpine | Frontend container runtime |
+| Python 3.11 Slim | Backend container runtime |
+
+---
+
+## Project Structure
+
+```
+eyefit/
+├── docker-compose.yml
+├── .gitignore
+├── LICENSE
+│
+├── frontend/
+│   ├── Dockerfile
+│   ├── next.config.ts              # Security headers, CSP, standalone build
+│   ├── package.json
+│   └── src/
+│       ├── app/                    # Next.js App Router pages
+│       │   ├── page.tsx            # Landing page
+│       │   ├── dashboard/
+│       │   ├── challenges/
+│       │   ├── play/               # Main game + CV page
+│       │   ├── history/
+│       │   ├── leaderboard/
+│       │   ├── profile/
+│       │   ├── results/
+│       │   └── settings/
+│       ├── components/
+│       ├── context/                # AuthContext
+│       ├── game/
+│       │   ├── GameEngine.ts       # 60 FPS rAF physics loop
+│       │   ├── Bird.ts
+│       │   ├── Obstacle.ts
+│       │   ├── DifficultyEngine.ts
+│       │   └── AudioSystem.ts
+│       ├── hooks/
+│       │   ├── useCamera.ts
+│       │   ├── useCalibration.ts
+│       │   ├── useGaze.ts          # FaceLandmarker → GazeState
+│       │   ├── usePose.ts          # PoseLandmarker frames
+│       │   ├── usePushUp.ts        # Rep counting via state machine
+│       │   ├── useSessionAnalytics.ts
+│       │   └── useDifficultyEngine.ts
+│       ├── lib/
+│       │   ├── gamification.ts     # XP/level logic (shared)
+│       │   └── gamification.test.ts
+│       └── vision/
+│           ├── face/
+│           ├── gaze/
+│           │   └── GazeAnalyzer.ts # Iris position → UP/CENTER/DOWN
+│           └── pose/
+│               ├── PoseTracker.ts
+│               └── PushUpAnalyzer.ts  # Elbow angle + state machine
+│
+├── backend/
+│   ├── Dockerfile
+│   ├── requirements.txt
+│   ├── .env.example
+│   └── app/
+│       ├── main.py                 # FastAPI app, security middleware
+│       ├── limiter.py              # slowapi rate limiter (shared)
+│       ├── api/
+│       │   ├── auth.py             # /auth/register, /auth/login, /auth/me
+│       │   ├── sessions.py         # /sessions (POST, GET)
+│       │   ├── leaderboard.py      # /leaderboard
+│       │   ├── coach.py            # /coach/{session_id}
+│       │   └── deps.py             # get_db, get_current_user
+│       ├── db/
+│       │   ├── database.py
+│       │   └── models.py           # User, UserProgress, GameSession, Achievement
+│       └── services/
+│           ├── auth.py             # JWT, bcrypt
+│           └── gamification.py     # XP, level, streak, achievement logic
+│
+├── docs/
+│   ├── 01_PRD.md
+│   ├── 02_Design.md
+│   ├── 03_Phases.md
+│   ├── 04_Architecture.md
+│   ├── 05_Setup_Guide.md
+│   ├── 06_Computer_Vision.md
+│   ├── 07_Project_Report_Template.md
+│   └── 08_Presentation_Outline.md
+│
+└── tests/
+    ├── backend/tests/test_auth.py
+    ├── backend/tests/test_gamification.py
+    └── frontend/src/lib/gamification.test.ts
+```
+
+---
+
+## Installation & Setup
+
+### Option A — Docker (Recommended)
+
+Requires: [Docker Desktop](https://www.docker.com/products/docker-desktop/)
+
+```bash
+# 1. Clone the repository
+git clone https://github.com/yourusername/eyefit.git
+cd eyefit
+
+# 2. Configure environment variables
+cp backend/.env.example backend/.env
+# Edit backend/.env and add your GEMINI_API_KEY
+
+# 3. Build and start all services
+docker-compose up --build
+```
+
+Navigate to `http://localhost:3000`. The API will be available at `http://localhost:8000`.
+
+---
+
+### Option B — Local Development
+
+<details>
+<summary><strong>Backend Setup</strong></summary>
+
+**Requirements:** Python 3.10+
+
+```bash
+cd backend
+
+# Create and activate a virtual environment
+python -m venv venv
+
+# Windows
+.\venv\Scripts\activate
+# macOS / Linux
+source venv/bin/activate
+
+# Install dependencies
+pip install -r requirements.txt
+
+# Configure environment variables
+cp .env.example .env
+# Edit .env with your values
+
+# Start the development server
+uvicorn app.main:app --host 127.0.0.1 --port 8000 --reload
+```
+
+API available at: `http://127.0.0.1:8000`  
+Interactive docs: `http://127.0.0.1:8000/docs`
+
+</details>
+
+<details>
+<summary><strong>Frontend Setup</strong></summary>
+
+**Requirements:** Node.js 18+
+
+```bash
+cd frontend
+
+# Install dependencies
+npm install
+
+# Start the development server
+npm run dev
+```
+
+App available at: `http://localhost:3000`
+
+</details>
+
+---
+
+## Environment Variables
+
+### Backend — `backend/.env`
+
+| Variable | Required | Description |
+|---|---|---|
+| `SECRET_KEY` | ✅ | Random 32-byte hex string for JWT signing. Generate: `python -c "import secrets; print(secrets.token_hex(32))"` |
+| `DATABASE_URL` | ✅ | SQLite: `sqlite:///./eyefit.db`. PostgreSQL: `postgresql://user:pass@host/db` |
+| `GEMINI_API_KEY` | ⚠️ Optional | Required for AI Coach. Get one at [aistudio.google.com](https://aistudio.google.com/app/apikey) |
+
+### Frontend
+
+| Variable | Default | Description |
+|---|---|---|
+| `NEXT_PUBLIC_API_URL` | `http://localhost:8000/api` | Backend API base URL |
+
+---
+
+## Usage
+
+1. **Register** a new account or log in.
+2. Navigate to **Challenges** and select **👀 Eye Flap** or **🔥 EyeFit**.
+3. Accept the **Camera Privacy Notice** — this is shown once and saved locally.
+4. Click **Enable Camera** and grant browser permission.
+5. Click **Calibrate Gaze** and follow the on-screen instructions (look CENTER → UP → DOWN).
+6. Start playing. Look **UP** to make the bird flap. Perform **push-ups** to earn shields.
+7. After the session, view your **XP gain**, **achievements**, and **form breakdown**.
+8. Click **Ask AI Coach** on any session card on the dashboard to receive personalized feedback.
+
+> **Tip:** For best accuracy, use good lighting and position your upper body fully within the camera frame.
+
+---
+
+## Testing
+
+### Backend
+
+```bash
+cd backend
+.\venv\Scripts\activate   # Windows
+source venv/bin/activate  # macOS / Linux
+
+python -m pytest tests/ -v
+```
+
+Tests cover:
+- `test_auth.py` — Registration and login endpoint validation
+- `test_gamification.py` — XP calculation, level progression, streak bonuses, achievement logic
+
+### Frontend
+
+```bash
+cd frontend
+npx vitest run
+```
+
+Tests cover:
+- `gamification.test.ts` — `levelFromXp`, `xpForLevel`, achievement registry validation
+
+---
+
+## Privacy & Security
+
+| Concern | How EyeFit handles it |
+|---|---|
+| **Camera data** | All CV inference runs in-browser via WebAssembly. No frames are sent to any server. |
+| **Video storage** | No raw video is recorded or stored — only derived numeric metrics. |
+| **User consent** | A camera privacy consent banner is shown before any camera access is requested. |
+| **Authentication** | Passwords are hashed using `bcrypt`. JWTs are signed with a secret key. |
+| **Rate limiting** | `/auth/register` is limited to 5 req/min per IP. `/auth/login` is limited to 10 req/min per IP. |
+| **Input validation** | All API request bodies are validated by Pydantic models with strict value bounds. |
+| **Security headers** | All API responses carry `X-Frame-Options`, `X-Content-Type-Options`, `X-XSS-Protection`, and `Referrer-Policy` headers. |
+| **Content Security Policy** | A strict CSP is applied via `next.config.ts` to the frontend. |
+| **CORS** | The API only accepts requests from `localhost:3000` / `127.0.0.1:3000`. |
+
+---
+
+## Limitations
+
+- **Lighting sensitivity:** Gaze tracking accuracy degrades significantly in poor or uneven lighting.
+- **Camera angle:** Push-up detection requires the user's upper body (shoulders, elbows, wrists) to be fully visible in the frame. This usually requires a camera placed to the side or at a low angle.
+- **Single user:** There is no multi-user session sharing or live multiplayer support.
+- **Upper-body only:** Push-ups are the only exercise currently supported. Squats and other lower-body movements are planned.
+- **Desktop first:** The application is optimized for desktop/laptop webcams. Mobile browser layout is not currently optimized.
+- **Performance estimates:** Fatigue and performance scores are based on observable movement signals, not physiological measurements. They should not be interpreted as medical data.
+
+---
+
+## Development Roadmap
+
+The project was built across 24 incremental phases. See [`docs/03_Phases.md`](docs/03_Phases.md) for the complete roadmap.
+
+| Milestone | Phases | Status |
+|---|---|---|
+| Playable Game | 0–3 | ✅ Complete |
+| Vision-Controlled Gameplay | 4–7 | ✅ Complete |
+| Push-Up Engine | 8–10 | ✅ Complete |
+| Session Analytics & Fatigue | 11–12 | ✅ Complete |
+| Full Integration & Adaptive Difficulty | 13–14 | ✅ Complete |
+| Database, Auth & Dashboard | 15–16 | ✅ Complete |
+| Gamification & AI Coach | 17–18 | ✅ Complete |
+| Testing & Performance | 19–20 | ✅ Complete |
+| Security, Deployment & Documentation | 21–24 | ✅ Complete |
+
+---
+
+## Contributing
+
+Contributions, bug reports, and feature suggestions are welcome.
+
+1. **Fork** the repository.
+2. Create a feature branch: `git checkout -b feat/your-feature-name`
+3. Commit your changes using conventional commits: `feat:`, `fix:`, `docs:`, `chore:`
+4. Push the branch and open a **Pull Request** with a clear description.
+
+Please ensure tests pass before submitting a PR.
+
+---
+
+## License
+
+This project is licensed under the [MIT License](LICENSE).
+
+---
+
+## Author
+
+**Yashraj Agawane**
+
+Built as a B.Tech final year project demonstrating the intersection of computer vision, game development, and fitness technology using modern web APIs.
+
+---
+
+<div align="center">
+  <sub>EyeFit — <em>Your eyes control the game. Your body controls the challenge.</em></sub>
+</div>
