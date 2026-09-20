@@ -61,3 +61,8 @@ htmlcov/
 .vercel
 .netlify
 *.pem
+
+# ─── Database ────────────────────────────────────────────────
+*.db
+*.sqlite
+*.sqlite3

@@ -21,6 +21,19 @@ export default function PlayRoute() {
   const { stream, state: cameraState, errorMsg, startCamera, stopCamera } = useCamera();
   const videoRef = useRef<HTMLVideoElement>(null);
   
+  // Privacy banner: shown until user dismisses it
+  const [privacyAccepted, setPrivacyAccepted] = useState(() => {
+    if (typeof window !== 'undefined') {
+      return localStorage.getItem('eyefit_camera_privacy_accepted') === 'true';
+    }
+    return false;
+  });
+
+  const handleAcceptPrivacy = () => {
+    localStorage.setItem('eyefit_camera_privacy_accepted', 'true');
+    setPrivacyAccepted(true);
+  };
+
   // We need to pass the raw ratio to the calibration hook
   const [currentRawRatio, setCurrentRawRatio] = useState(0.5);
 
@@ -150,12 +163,36 @@ export default function PlayRoute() {
             )}
 
             {cameraState === CameraState.IDLE || cameraState === CameraState.ERROR ? (
-              <button 
-                onClick={startCamera}
-                className="px-4 py-2 bg-primary text-white rounded-lg font-bold hover:bg-accent transition-colors"
-              >
-                Enable Camera
-              </button>
+              <>
+                {!privacyAccepted && (
+                  <div className="absolute inset-0 bg-black/80 backdrop-blur-sm z-30 flex items-center justify-center p-6">
+                    <div className="bg-zinc-900 border border-white/10 rounded-2xl p-8 max-w-md w-full text-center shadow-2xl">
+                      <div className="text-4xl mb-4">🎥</div>
+                      <h2 className="text-xl font-bold text-white mb-3">Camera Permission</h2>
+                      <p className="text-zinc-400 text-sm leading-relaxed mb-6">
+                        EyeFit uses your camera to track your <strong className="text-white">eye movements</strong> and <strong className="text-white">body pose</strong> in real-time.
+                        <br /><br />
+                        Your camera feed is <strong className="text-green-400">processed entirely on your device</strong>. No video or image data is ever recorded, stored, or sent to any server.
+                      </p>
+                      <button
+                        onClick={handleAcceptPrivacy}
+                        className="w-full py-3 bg-primary text-white rounded-lg font-bold hover:bg-accent transition-colors"
+                      >
+                        I Understand — Enable Camera
+                      </button>
+                    </div>
+                  </div>
+                )}
+                {privacyAccepted && (
+                  <button
+                    onClick={startCamera}
+                    className="px-4 py-2 bg-primary text-white rounded-lg font-bold hover:bg-accent transition-colors"
+                  >
+                    Enable Camera
+                  </button>
+                )}
+              </>
+
             ) : (
               <button 
                 onClick={stopCamera}

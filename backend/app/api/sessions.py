@@ -1,7 +1,7 @@
 from typing import Any, List
 from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
-from pydantic import BaseModel
+from pydantic import BaseModel, field_validator
 from datetime import datetime
 from app.db.models import User, GameSession
 from app.api.deps import get_db, get_current_user
@@ -16,6 +16,27 @@ class SessionCreate(BaseModel):
     average_form: int
     performance_score: int
     fatigue_indicator: int
+
+    @field_validator('duration_seconds')
+    @classmethod
+    def duration_valid(cls, v: int) -> int:
+        if v < 0 or v > 7200:  # max 2 hours
+            raise ValueError('Session duration must be between 0 and 7200 seconds')
+        return v
+
+    @field_validator('game_score', 'total_reps', 'valid_reps')
+    @classmethod
+    def non_negative_and_sane(cls, v: int) -> int:
+        if v < 0 or v > 99999:
+            raise ValueError('Value is out of acceptable range')
+        return v
+
+    @field_validator('average_form', 'performance_score', 'fatigue_indicator')
+    @classmethod
+    def percentage_valid(cls, v: int) -> int:
+        if v < 0 or v > 100:
+            raise ValueError('Percentage value must be between 0 and 100')
+        return v
 
 class SessionResponse(SessionCreate):
     id: int
