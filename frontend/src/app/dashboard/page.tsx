@@ -91,6 +91,97 @@ function fmtDuration(seconds: number) {
   return `${m}:${s}`;
 }
 
+function SessionCard({ session }: { session: Session }) {
+  const [feedback, setFeedback] = useState<any>(null);
+  const [loading, setLoading] = useState(false);
+
+  const handleAskCoach = async () => {
+    if (feedback) return; // already loaded
+    setLoading(true);
+    try {
+      const data = await fetchWithAuth(`/coach/${session.id}`);
+      setFeedback(data);
+    } catch (error) {
+      console.error(error);
+      setFeedback({ summary: "Failed to load coach feedback.", strength: "", improvement_area: "", suggested_next_target: "" });
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return (
+    <Card className="flex flex-col hover:border-white/20 transition-colors">
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center">
+        <div>
+          <div className="font-bold text-white text-lg">Eye Flap</div>
+          <div className="text-sm text-zinc-400">
+            {new Date(session.created_at).toLocaleDateString(undefined, {
+              weekday: "short", month: "short", day: "numeric"
+            })}
+            {" · "}
+            {fmtDuration(session.duration_seconds)}
+            {" · "}
+            {session.valid_reps} reps
+          </div>
+        </div>
+        <div className="flex gap-8 text-right mt-4 sm:mt-0">
+          <div>
+            <div className="text-xs text-zinc-500 uppercase">Score</div>
+            <div className="font-bold text-white">{session.game_score}</div>
+          </div>
+          <div>
+            <div className="text-xs text-zinc-500 uppercase">Form</div>
+            <div className={`font-bold ${session.average_form >= 80 ? "text-green-400" : session.average_form >= 50 ? "text-yellow-400" : "text-red-400"}`}>
+              {session.average_form}%
+            </div>
+          </div>
+          <div>
+            <div className="text-xs text-zinc-500 uppercase">Perf</div>
+            <div className="font-bold text-cyan-400">{session.performance_score}</div>
+          </div>
+        </div>
+      </div>
+      
+      {/* AI Coach Section */}
+      <div className="mt-4 pt-4 border-t border-white/5">
+        {!feedback && !loading && (
+          <button onClick={handleAskCoach} className="text-sm font-bold text-indigo-400 hover:text-indigo-300 transition-colors flex items-center gap-2">
+            <span>🤖</span> Ask AI Coach
+          </button>
+        )}
+        {loading && (
+          <div className="text-sm text-zinc-500 flex items-center gap-2 animate-pulse">
+            <div className="w-3 h-3 border-2 border-indigo-400 border-t-transparent rounded-full animate-spin"></div>
+            Analyzing session...
+          </div>
+        )}
+        {feedback && (
+          <div className="bg-indigo-950/30 border border-indigo-500/20 rounded-lg p-4">
+            <div className="text-indigo-400 font-bold mb-2 flex items-center gap-2">
+              <span>🤖</span> Coach AI
+            </div>
+            <p className="text-white text-sm mb-3">{feedback.summary}</p>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-xs">
+              <div>
+                <div className="text-green-400 font-bold mb-1">STRENGTH</div>
+                <div className="text-zinc-300">{feedback.strength}</div>
+              </div>
+              <div>
+                <div className="text-amber-400 font-bold mb-1">IMPROVE</div>
+                <div className="text-zinc-300">{feedback.improvement_area}</div>
+              </div>
+              <div>
+                <div className="text-cyan-400 font-bold mb-1">NEXT TARGET</div>
+                <div className="text-zinc-300">{feedback.suggested_next_target}</div>
+              </div>
+            </div>
+          </div>
+        )}
+      </div>
+    </Card>
+  );
+}
+
 export default function Dashboard() {
   const { user, loading: authLoading } = useAuth();
   const [stats, setStats] = useState<Stats | null>(null);
@@ -271,36 +362,7 @@ export default function Dashboard() {
         ) : (
           <div className="space-y-3">
             {(stats?.recentSessions ?? []).map((session) => (
-              <Card key={session.id} className="flex flex-col sm:flex-row justify-between items-start sm:items-center hover:border-white/20 transition-colors">
-                <div>
-                  <div className="font-bold text-white text-lg">Eye Flap</div>
-                  <div className="text-sm text-zinc-400">
-                    {new Date(session.created_at).toLocaleDateString(undefined, {
-                      weekday: "short", month: "short", day: "numeric"
-                    })}
-                    {" · "}
-                    {fmtDuration(session.duration_seconds)}
-                    {" · "}
-                    {session.valid_reps} reps
-                  </div>
-                </div>
-                <div className="flex gap-8 text-right mt-4 sm:mt-0">
-                  <div>
-                    <div className="text-xs text-zinc-500 uppercase">Score</div>
-                    <div className="font-bold text-white">{session.game_score}</div>
-                  </div>
-                  <div>
-                    <div className="text-xs text-zinc-500 uppercase">Form</div>
-                    <div className={`font-bold ${session.average_form >= 80 ? "text-green-400" : session.average_form >= 50 ? "text-yellow-400" : "text-red-400"}`}>
-                      {session.average_form}%
-                    </div>
-                  </div>
-                  <div>
-                    <div className="text-xs text-zinc-500 uppercase">Perf</div>
-                    <div className="font-bold text-cyan-400">{session.performance_score}</div>
-                  </div>
-                </div>
-              </Card>
+              <SessionCard key={session.id} session={session} />
             ))}
           </div>
         )}
