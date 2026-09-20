@@ -106,11 +106,8 @@ EyeFit bridges this gap by delivering:
 - 🔒 **Security Hardening** — HTTP security headers, CSP, CORS restrictions, input validation on all API models
 - 🐳 **Docker Deployment** — multi-stage frontend Dockerfile + backend Dockerfile + `docker-compose.yml`
 - 🧪 **Automated Tests** — backend `pytest` suite (auth + gamification); frontend `vitest` suite (gamification logic)
-
-### 🚧 In Progress
-
-- **Push-Up Challenge Mode** — UI card exists on `/challenges`. Core engine is complete; standalone mode not yet wired up.
-- **Endurance Mode** — UI card exists. Metrics engine is complete; dedicated flow not yet connected.
+- 💪 **Push-Up Challenge Mode** — dedicated flow for push-up tracking with user-selected rep targets
+- ⏱️ **Endurance Mode** — timed survival mode integrating both gaze-controlled gameplay and push-up form tracking
 
 ### 🔮 Planned
 
