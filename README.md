@@ -548,26 +548,6 @@ Tests cover:
 
 ---
 
-## Development Roadmap
-
-The project was built across 24 incremental phases. See [`docs/03_Phases.md`](docs/03_Phases.md) for the complete roadmap.
-
-| Milestone | Phases | Status |
-|---|---|---|
-| Playable Game | 0–3 | ✅ Complete |
-| Vision-Controlled Gameplay | 4–7 | ✅ Complete |
-| Push-Up Engine | 8–10 | ✅ Complete |
-| Session Analytics & Fatigue | 11–12 | ✅ Complete |
-| Full Integration & Adaptive Difficulty | 13–14 | ✅ Complete |
-| Database, Auth & Dashboard | 15–16 | ✅ Complete |
-| Gamification & AI Coach | 17–18 | ✅ Complete |
-| Testing & Performance | 19–20 | ✅ Complete |
-| Security, Deployment & Documentation | 21–24 | ✅ Complete |
-
-<p align="right">(<a href="#readme-top">back to top ↑</a>)</p>
-
----
-
 ## Contributing
 
 Contributions, bug reports, and feature suggestions are welcome.
