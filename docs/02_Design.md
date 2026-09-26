@@ -1,4 +1,4 @@
-# EyeFit — UI/UX & Game Design Specification
+# GazeFlap — UI/UX & Game Design Specification
 
 **Version:** 1.0
 
@@ -6,7 +6,7 @@
 
 # 1. Design Vision
 
-EyeFit should feel like a futuristic fitness game rather than a traditional workout tracker.
+GazeFlap should feel like a futuristic fitness game rather than a traditional workout tracker.
 
 ### Visual direction
 
@@ -60,7 +60,7 @@ Camera usage should always be obvious.
 
 ## Name
 
-**EyeFit**
+**GazeFlap**
 
 ## Tagline
 
@@ -90,7 +90,7 @@ Use:
 ├── Challenges
 │   ├── Eye Flap
 │   ├── Push-Up Challenge
-│   ├── EyeFit Challenge
+│   ├── GazeFlap Challenge
 │   └── Endurance Mode
 ├── Session
 ├── Results
@@ -136,7 +136,7 @@ Camera: READY
 ### Header
 
 ```text
-EyeFit                     🔔     Profile
+GazeFlap                     🔔     Profile
 ```
 
 ### Welcome card
@@ -170,7 +170,7 @@ Line/bar charts for:
 Each session card:
 
 ```text
-EyeFit Challenge
+GazeFlap Challenge
 32 reps • 08:42
 Score: 2481
 Form: 87%
@@ -198,7 +198,7 @@ Use large cards.
 └──────────────────┘
 
 ┌──────────────────┐
-│ 🔥 EYEFIT        │
+│ 🔥 GazeFlap        │
 │ Game + Workout   │
 │                  │
 │ [ CHALLENGE ]    │
@@ -579,7 +579,7 @@ Provide:
 
 ```text
 Camera access is required for
-EyeFit Challenge.
+GazeFlap Challenge.
 
 [ TRY AGAIN ]
 ```

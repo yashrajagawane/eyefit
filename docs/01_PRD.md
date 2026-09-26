@@ -1,6 +1,6 @@
-# EyeFit — Product Requirements Document (PRD)
+# GazeFlap — Product Requirements Document (PRD)
 
-**Project:** EyeFit  
+**Project:** GazeFlap  
 **Working title:** Vision-Based Gamified Fitness & Endurance System  
 **Version:** 1.0  
 **Status:** Product Definition  
@@ -11,7 +11,7 @@
 
 ## 1. Product Overview
 
-EyeFit is a computer-vision-powered fitness gaming platform that combines gaze-controlled gameplay with real-time exercise monitoring.
+GazeFlap is a computer-vision-powered fitness gaming platform that combines gaze-controlled gameplay with real-time exercise monitoring.
 
 The user controls a Flappy Bird-style character using eye/gaze direction while a webcam-based pose estimation system detects push-ups, evaluates exercise form, tracks performance, estimates fatigue indicators, and produces an overall fitness/game session score.
 
@@ -29,7 +29,7 @@ Most fitness applications focus on exercise tracking, while most casual games fo
 
 Users may also lose motivation when workouts become repetitive. A system that combines physical activity with interactive gameplay can make exercise more engaging while collecting meaningful performance metrics.
 
-EyeFit addresses this gap by combining:
+GazeFlap addresses this gap by combining:
 
 - Eye/gaze-based game interaction
 - Computer-vision exercise tracking
@@ -184,7 +184,7 @@ The game can remain simple while the exercise engine focuses on accurate repetit
 
 ---
 
-### 8.3 EyeFit Challenge
+### 8.3 GazeFlap Challenge
 
 The main combined mode.
 
@@ -480,7 +480,7 @@ Evaluate:
 
 The MVP is complete when a user can:
 
-1. Open EyeFit.
+1. Open GazeFlap.
 2. Allow camera access.
 3. Calibrate gaze.
 4. Start the game.

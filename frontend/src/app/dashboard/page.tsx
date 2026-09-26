@@ -237,7 +237,7 @@ export default function Dashboard() {
                         className="bg-gradient-to-r from-primary to-accent h-3 rounded-full transition-all duration-1000"
                         style={{ width: `${pct}%` }}
                       />
-                      <div className="absolute inset-0 flex items-center justify-center text-[10px] font-bold text-white drop-shadow-md">
+                      <div className="absolute inset-0 flex items-center justify-center text-[10px] font-bold text-white">
                         {currentXp} / {nextLvlXp} XP
                       </div>
                     </>

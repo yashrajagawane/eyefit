@@ -15,7 +15,7 @@ load_dotenv()
 config = context.config
 
 # Overwrite the sqlalchemy.url from the env variable
-config.set_main_option("sqlalchemy.url", os.getenv("DATABASE_URL", "sqlite:///./eyefit.db"))
+config.set_main_option("sqlalchemy.url", os.getenv("DATABASE_URL", "sqlite:///./GazeFlap.db"))
 
 # Interpret the config file for Python logging.
 # This line sets up loggers basically.

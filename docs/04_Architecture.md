@@ -1,6 +1,6 @@
 # System Architecture
 
-EyeFit relies on a decoupled architecture, clearly separating the real-time, browser-based inference and game rendering loops from the standard React UI lifecycle, and backing it all with a stateless FastAPI backend.
+GazeFlap relies on a decoupled architecture, clearly separating the real-time, browser-based inference and game rendering loops from the standard React UI lifecycle, and backing it all with a stateless FastAPI backend.
 
 ## High-Level Architecture
 

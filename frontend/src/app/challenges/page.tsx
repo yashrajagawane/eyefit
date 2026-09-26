@@ -19,8 +19,8 @@ const MODES = [
     active: true,
   },
   {
-    id: "eyefit",
-    title: "🔥 EYEFIT",
+    id: "GazeFlap",
+    title: "🔥 GazeFlap",
     desc: "Game + Workout — gaze controls the bird, push-ups grant shields.",
     btn: "PLAY",
     href: "/play",

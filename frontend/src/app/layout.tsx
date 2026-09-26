@@ -15,7 +15,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "EyeFit",
+  title: "GazeFlap",
   description: "Vision-Based Gamified Fitness & Endurance System",
 };
 

@@ -1,6 +1,6 @@
 # Local Development Setup Guide
 
-This guide explains how to run the EyeFit application directly on your local machine for development purposes.
+This guide explains how to run the GazeFlap application directly on your local machine for development purposes.
 
 ## Prerequisites
 - Node.js (v18 or higher)

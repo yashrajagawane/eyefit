@@ -1,7 +1,7 @@
 <a name="readme-top"></a>
 <div align="center">
 
-# 👀 EyeFit
+# 👀 GazeFlap
 
 ### *Your eyes control the game. Your body controls the challenge.*
 
@@ -25,7 +25,7 @@ A browser-based fitness gaming platform powered by on-device computer vision —
 <div align="center">
 
 <!-- Replace with an actual gameplay clip, e.g. docs/screenshots/demo.gif -->
-<img src="docs/screenshots/demo.gif" width="850" alt="EyeFit gameplay demo — gaze-controlled bird with live push-up tracking" />
+<img src="docs/screenshots/demo.gif" width="850" alt="GazeFlap gameplay demo — gaze-controlled bird with live push-up tracking" />
 
 <sub>Gaze-controlled gameplay running alongside live push-up form tracking, entirely in-browser.</sub>
 
@@ -40,7 +40,7 @@ A browser-based fitness gaming platform powered by on-device computer vision —
 - [Overview](#overview)
 - [Problem Statement](#problem-statement)
 - [Features](#features)
-- [How EyeFit Works](#how-eyefit-works)
+- [How GazeFlap Works](#how-GazeFlap-works)
 - [Architecture](#architecture)
 - [Tech Stack](#tech-stack)
 - [Project Structure](#project-structure)
@@ -59,7 +59,7 @@ A browser-based fitness gaming platform powered by on-device computer vision —
 
 ## Overview
 
-EyeFit is a computer-vision-powered fitness gaming platform that runs entirely in the browser. It combines gaze-controlled gameplay with real-time exercise monitoring using nothing but a standard webcam.
+GazeFlap is a computer-vision-powered fitness gaming platform that runs entirely in the browser. It combines gaze-controlled gameplay with real-time exercise monitoring using nothing but a standard webcam.
 
 The user controls a Flappy Bird-style game character by looking **UP** or **DOWN**, while a pose estimation system simultaneously detects push-ups, evaluates exercise form, tracks fatigue, and produces a combined fitness-game score. Post-session, an AI-powered coach delivers personalized feedback based on structured performance metrics.
 
@@ -76,7 +76,7 @@ Most fitness applications focus on exercise logging, while most casual games foc
 
 Home workouts also lack real-time form correction, personalized feedback, and the kind of engagement that keeps users coming back. High-quality interactive exergames (VR headsets, Kinect) require expensive specialized hardware that most users don't own.
 
-EyeFit bridges this gap by delivering:
+GazeFlap bridges this gap by delivering:
 
 - Interactive, physically demanding gameplay requiring only a webcam
 - Real-time form analysis and fatigue estimation
@@ -121,11 +121,11 @@ EyeFit bridges this gap by delivering:
 
 ---
 
-## How EyeFit Works
+## How GazeFlap Works
 
 ### 1. Eye & Gaze Tracking
 
-EyeFit uses the Google MediaPipe `FaceLandmarker` task to extract **478 3D facial landmarks** in real time.
+GazeFlap uses the Google MediaPipe `FaceLandmarker` task to extract **478 3D facial landmarks** in real time.
 
 The gaze analyzer (`GazeAnalyzer.ts`) calculates the vertical position of the iris center relative to the upper and lower eyelid landmarks. This produces a **normalized pitch ratio** — when the iris sits significantly closer to the upper eyelid, the system classifies gaze as `UP`; when it drifts toward the lower eyelid, `DOWN`.
 
@@ -142,7 +142,7 @@ Temporal smoothing and a confidence threshold prevent control jitter from brief 
 
 ### 2. Push-Up Detection & Form Analysis
 
-EyeFit uses the MediaPipe `PoseLandmarker` task to track **33 skeletal landmarks** per frame.
+GazeFlap uses the MediaPipe `PoseLandmarker` task to track **33 skeletal landmarks** per frame.
 
 The push-up engine (`PushUpAnalyzer.ts`) isolates the shoulder, elbow, and wrist landmarks and calculates the true 3D interior elbow angle using the **Law of Cosines**:
 
@@ -284,7 +284,7 @@ graph TD
 ## Project Structure
 
 ```
-eyefit/
+GazeFlap/
 ├── docker-compose.yml
 ├── .gitignore
 ├── LICENSE
@@ -379,8 +379,8 @@ Requires: [Docker Desktop](https://www.docker.com/products/docker-desktop/)
 
 ```bash
 # 1. Clone the repository
-git clone https://github.com/yashrajagawane/eyefit.git
-cd eyefit
+git clone https://github.com/yashrajagawane/GazeFlap.git
+cd GazeFlap
 
 # 2. Configure environment variables
 cp backend/.env.example backend/.env
@@ -456,7 +456,7 @@ App available at: `http://localhost:3000`
 | Variable | Required | Description |
 |---|---|---|
 | `SECRET_KEY` | ✅ | Random 32-byte hex string for JWT signing. Generate: `python -c "import secrets; print(secrets.token_hex(32))"` |
-| `DATABASE_URL` | ✅ | SQLite: `sqlite:///./eyefit.db`. PostgreSQL: `postgresql://user:pass@host/db` |
+| `DATABASE_URL` | ✅ | SQLite: `sqlite:///./GazeFlap.db`. PostgreSQL: `postgresql://user:pass@host/db` |
 | `GEMINI_API_KEY` | ⚠️ Optional | Required for the AI Coach. Get one at [aistudio.google.com](https://aistudio.google.com/app/apikey) |
 
 ### Frontend
@@ -472,7 +472,7 @@ App available at: `http://localhost:3000`
 ## Usage
 
 1. **Register** a new account or log in.
-2. Navigate to **Challenges** and select **👀 Eye Flap** or **🔥 EyeFit**.
+2. Navigate to **Challenges** and select **👀 Eye Flap** or **🔥 GazeFlap**.
 3. Accept the **Camera Privacy Notice** — shown once and saved locally.
 4. Click **Enable Camera** and grant browser permission.
 5. Click **Calibrate Gaze** and follow the on-screen instructions (look CENTER → UP → DOWN).
@@ -519,7 +519,7 @@ Tests cover:
 
 ## Privacy & Security
 
-| Concern | How EyeFit handles it |
+| Concern | How GazeFlap handles it |
 |---|---|
 | **Camera data** | All CV inference runs in-browser via WebAssembly. No frames are sent to any server. |
 | **Video storage** | No raw video is recorded or stored — only derived numeric metrics. |
@@ -581,7 +581,7 @@ Built as a B.Tech final-year project demonstrating the intersection of computer 
 ---
 
 <div align="center">
-  <sub>EyeFit — <em>Your eyes control the game. Your body controls the challenge.</em></sub>
+  <sub>GazeFlap — <em>Your eyes control the game. Your body controls the challenge.</em></sub>
   <br />
   <sub>⭐ If this project is useful to you, consider starring the repo.</sub>
 </div>

@@ -1,6 +1,6 @@
 # Computer Vision Methodology
 
-EyeFit processes raw video frames directly in the browser to extract meaningful human inputs without needing specialized hardware.
+GazeFlap processes raw video frames directly in the browser to extract meaningful human inputs without needing specialized hardware.
 
 ## Face & Gaze Tracking
 
@@ -13,7 +13,7 @@ To determine where the user is looking, we isolate the specific landmarks surrou
 2. **Pitch Estimation (Up/Down)**:
    We calculate the vertical distance from the center of the iris to the top and bottom eyelids. If the iris is significantly closer to the top eyelid, the user is looking UP.
 3. **Calibration**:
-   Because eye shapes differ wildly across users, hardcoding thresholds leads to poor user experiences. EyeFit includes a **Calibration UI** that prompts the user to look CENTER, UP, and DOWN. It averages the ratios over several frames to establish personalized bounding thresholds.
+   Because eye shapes differ wildly across users, hardcoding thresholds leads to poor user experiences. GazeFlap includes a **Calibration UI** that prompts the user to look CENTER, UP, and DOWN. It averages the ratios over several frames to establish personalized bounding thresholds.
 
 ## Body Pose & Push-Up Detection
 

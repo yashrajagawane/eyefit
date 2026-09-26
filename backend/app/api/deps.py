@@ -8,7 +8,7 @@ from app.db.database import SessionLocal
 from app.db.models import User
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/api/auth/login")
-SECRET_KEY = os.getenv("SECRET_KEY", "eyefit-super-secret-key-12345")
+SECRET_KEY = os.getenv("SECRET_KEY", "GazeFlap-super-secret-key-12345")
 ALGORITHM = os.getenv("ALGORITHM", "HS256")
 
 def get_db() -> Generator:

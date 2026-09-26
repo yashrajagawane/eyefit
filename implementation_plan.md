@@ -15,14 +15,14 @@ This phase introduces an analytical layer on top of the session metrics to estim
 
 ### 1. Enhance `PushUpAnalyzer`
 
-#### [MODIFY] [PushUpAnalyzer.ts](file:///c:/Users/agawa/OneDrive/Desktop/Antigravity%20Desktop%20Projects/eyefit/frontend/src/vision/pose/PushUpAnalyzer.ts)
+#### [MODIFY] [PushUpAnalyzer.ts](file:///c:/Users/agawa/OneDrive/Desktop/Antigravity%20Desktop%20Projects/GazeFlap/frontend/src/vision/pose/PushUpAnalyzer.ts)
 - Add tracking for `repStartTime` (set when `state` transitions from `UP` to `MOVING_DOWN`).
 - Add `repDurationMs`, `minElbowAngle`, and `maxElbowAngle` to the `FormResult` interface.
 - Populate these new fields in the `evaluateForm` method.
 
 ### 2. Update Session Analytics & Create Fatigue Engine
 
-#### [MODIFY] [useSessionAnalytics.ts](file:///c:/Users/agawa/OneDrive/Desktop/Antigravity%20Desktop%20Projects/eyefit/frontend/src/hooks/useSessionAnalytics.ts)
+#### [MODIFY] [useSessionAnalytics.ts](file:///c:/Users/agawa/OneDrive/Desktop/Antigravity%20Desktop%20Projects/GazeFlap/frontend/src/hooks/useSessionAnalytics.ts)
 - Extend `SessionMetrics` to include `fatigueIndicator` (0-100) and `performanceScore` (0-100).
 - Create a `calculateFatigueAndPerformance(formResults: FormResult[])` helper function.
 - **Fatigue Logic**:
@@ -35,7 +35,7 @@ This phase introduces an analytical layer on top of the session metrics to estim
 
 ### 3. Update the UI
 
-#### [MODIFY] [GameCanvas.tsx](file:///c:/Users/agawa/OneDrive/Desktop/Antigravity%20Desktop%20Projects/eyefit/frontend/src/components/game/GameCanvas.tsx)
+#### [MODIFY] [GameCanvas.tsx](file:///c:/Users/agawa/OneDrive/Desktop/Antigravity%20Desktop%20Projects/GazeFlap/frontend/src/components/game/GameCanvas.tsx)
 - Add the new `Fatigue` and `Performance` metrics to the GAME OVER session summary overlay.
 - Use color-coding (e.g., Performance: Green = >80, Yellow = 50-80, Red = <50).
 

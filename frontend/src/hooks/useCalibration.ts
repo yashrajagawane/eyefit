@@ -10,7 +10,7 @@ export enum CalibrationStep {
 }
 
 // Local storage key
-const CALIBRATION_KEY = "eyefit_gaze_thresholds";
+const CALIBRATION_KEY = "GazeFlap_gaze_thresholds";
 
 export function useCalibration(currentRawRatio: number) {
   const [step, setStep] = useState<CalibrationStep>(CalibrationStep.IDLE);

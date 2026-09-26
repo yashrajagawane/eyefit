@@ -1,4 +1,4 @@
-# EyeFit — Development Phases & Execution Roadmap
+# GazeFlap — Development Phases & Execution Roadmap
 
 **Version:** 1.0  
 **Strategy:** Build a working product incrementally.
@@ -370,7 +370,7 @@ Unified Session
 
 ### Example
 
-During EyeFit Challenge:
+During GazeFlap Challenge:
 
 - Gaze controls bird.
 - Push-ups increment challenge progress.
@@ -379,7 +379,7 @@ During EyeFit Challenge:
 
 ### Deliverable
 
-Core EyeFit experience.
+Core GazeFlap experience.
 
 ---
 
@@ -696,7 +696,7 @@ Testing + Security + Deployment ✓
 The final product should allow a new user to complete an entire session without developer intervention:
 
 ```text
-Open EyeFit
+Open GazeFlap
    ↓
 Login
    ↓

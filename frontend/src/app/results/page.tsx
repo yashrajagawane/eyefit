@@ -43,7 +43,7 @@ export default function Results() {
   const [coachLoading, setCoachLoading] = useState(false);
 
   useEffect(() => {
-    const raw = localStorage.getItem("eyefit_last_session");
+    const raw = localStorage.getItem("GazeFlap_last_session");
     if (!raw) {
       // No session data — redirect back
       router.replace("/challenges");
@@ -81,7 +81,7 @@ export default function Results() {
         <h1 className="text-4xl font-black mb-2 text-primary neon-text-glow uppercase tracking-wider">
           Session Complete 🎉
         </h1>
-        <p className="text-zinc-400">EyeFit Challenge</p>
+        <p className="text-zinc-400">GazeFlap Challenge</p>
       </div>
 
       {/* Score */}

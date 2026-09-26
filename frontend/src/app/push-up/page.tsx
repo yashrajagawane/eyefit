@@ -60,7 +60,7 @@ export default function PushUpRoute() {
             })
           });
           // Persist session result to localStorage for the Results page
-          localStorage.setItem('eyefit_last_session', JSON.stringify(res));
+          localStorage.setItem('GazeFlap_last_session', JSON.stringify(res));
           router.push('/results');
         } catch (error) {
           console.error("Failed to save session:", error);

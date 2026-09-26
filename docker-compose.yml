@@ -8,9 +8,9 @@ services:
     ports:
       - "8000:8000"
     volumes:
-      - eyefit_db:/app/data
+      - GazeFlap_db:/app/data
     environment:
-      - DATABASE_URL=sqlite:////app/data/eyefit.db
+      - DATABASE_URL=sqlite:////app/data/GazeFlap.db
       - SECRET_KEY=${SECRET_KEY:-default_secret_key_change_me_in_prod}
     restart: unless-stopped
 
@@ -27,4 +27,4 @@ services:
     restart: unless-stopped
 
 volumes:
-  eyefit_db:
+  GazeFlap_db:

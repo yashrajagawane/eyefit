@@ -27,7 +27,7 @@ export default function LeaderboardPage() {
         <h1 className="text-4xl font-black neon-text-glow text-primary tracking-wider uppercase mb-2">
           Leaderboard
         </h1>
-        <p className="text-zinc-400">Top EyeFit players globally.</p>
+        <p className="text-zinc-400">Top GazeFlap players globally.</p>
       </header>
 
       <Card glow className="bg-white/5 border border-white/10 p-0 overflow-hidden">

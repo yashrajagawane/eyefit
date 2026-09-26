@@ -1,11 +1,11 @@
-# PRESENTATION OUTLINE: EyeFit
+# PRESENTATION OUTLINE: GazeFlap
 
 *This is a suggested slide-by-slide structure for a 10-15 minute B.Tech Project Defense or Portfolio Presentation.*
 
 ---
 
 ## Slide 1: Title Slide
-- **Title**: EyeFit - Vision-Based Gamified Fitness & Endurance System
+- **Title**: GazeFlap - Vision-Based Gamified Fitness & Endurance System
 - **Subtitle**: Replacing expensive hardware with browser-based AI.
 - **Presenter Name**: [Your Name]
 - **Date**: [Date]
@@ -15,7 +15,7 @@
 - **Hardware Barrier**: Interactive exergames (VR, Kinect, Ring Fit) require expensive, specialized hardware.
 - **No Form Correction**: Most apps only log data; they don't tell you if you are doing the exercise correctly.
 
-## Slide 3: The Solution (EyeFit)
+## Slide 3: The Solution (GazeFlap)
 - A web application that requires **only a standard webcam**.
 - Merges a hands-free, eye-controlled game with physical endurance (push-ups).
 - **Core Loop**: Your eyes control the game character; your physical push-ups grant you in-game shields/health.

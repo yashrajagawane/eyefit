@@ -1,6 +1,6 @@
-# PROJECT REPORT: EyeFit
+# PROJECT REPORT: GazeFlap
 
-**Title:** EyeFit: A Vision-Based Gamified Fitness & Endurance System  
+**Title:** GazeFlap: A Vision-Based Gamified Fitness & Endurance System  
 **Submitted by:** [Your Name / Team Name]  
 **Degree / Course:** [B.Tech / B.Sc Computer Science / Portfolio]  
 **Date:** [Date]  
@@ -8,7 +8,7 @@
 ---
 
 ## Abstract
-Physical fitness is often hindered by a lack of motivation, engagement, and access to proper form evaluation. EyeFit proposes a novel solution by merging computer vision with gamification. Using standard webcams and on-device machine learning (Google MediaPipe), the system tracks user gaze and body mechanics in real-time. The application features a hands-free game controlled by eye movements, intertwined with physical push-ups that provide in-game advantages. Additionally, an AI-powered coach evaluates the user's form and provides tailored feedback. This report details the architecture, algorithms, and technical implementation of EyeFit.
+Physical fitness is often hindered by a lack of motivation, engagement, and access to proper form evaluation. GazeFlap proposes a novel solution by merging computer vision with gamification. Using standard webcams and on-device machine learning (Google MediaPipe), the system tracks user gaze and body mechanics in real-time. The application features a hands-free game controlled by eye movements, intertwined with physical push-ups that provide in-game advantages. Additionally, an AI-powered coach evaluates the user's form and provides tailored feedback. This report details the architecture, algorithms, and technical implementation of GazeFlap.
 
 ---
 
@@ -89,7 +89,7 @@ The system uses a decoupled architecture. The Next.js frontend runs a 60 FPS `re
 - **Accuracy**: Gaze tracking functions accurately in well-lit environments up to 1 meter from the webcam. Push-up detection requires the upper body to be fully visible in the frame.
 
 ### 6.2 Conclusion
-EyeFit successfully demonstrates that complex, interactive exergames can be built for the web without requiring specialized hardware. By processing heavy computer vision workloads client-side, the system maintains strict user privacy while delivering a highly responsive gamified workout.
+GazeFlap successfully demonstrates that complex, interactive exergames can be built for the web without requiring specialized hardware. By processing heavy computer vision workloads client-side, the system maintains strict user privacy while delivering a highly responsive gamified workout.
 
 ### 6.3 Future Scope
 - Expand the pose engine to include lower-body exercises (e.g., squats).

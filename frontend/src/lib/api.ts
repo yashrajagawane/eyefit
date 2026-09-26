@@ -1,7 +1,7 @@
 const API_URL = "http://localhost:8000/api";
 
 export async function fetchWithAuth(endpoint: string, options: RequestInit = {}) {
-  const token = localStorage.getItem("eyefit_token");
+  const token = localStorage.getItem("GazeFlap_token");
   
   const headers = new Headers(options.headers || {});
   if (token) {

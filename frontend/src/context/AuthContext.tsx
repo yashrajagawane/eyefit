@@ -27,14 +27,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   useEffect(() => {
     const checkAuth = async () => {
-      const token = localStorage.getItem("eyefit_token");
+      const token = localStorage.getItem("GazeFlap_token");
       if (token) {
         try {
           const userData = await fetchWithAuth("/auth/me");
           setUser(userData);
         } catch (error) {
           console.error("Auth check failed:", error);
-          localStorage.removeItem("eyefit_token");
+          localStorage.removeItem("GazeFlap_token");
         }
       }
       setLoading(false);
@@ -44,13 +44,13 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }, []);
 
   const login = async (token: string) => {
-    localStorage.setItem("eyefit_token", token);
+    localStorage.setItem("GazeFlap_token", token);
     const userData = await fetchWithAuth("/auth/me");
     setUser(userData);
   };
 
   const logout = () => {
-    localStorage.removeItem("eyefit_token");
+    localStorage.removeItem("GazeFlap_token");
     setUser(null);
   };
 

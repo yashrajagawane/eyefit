@@ -26,13 +26,13 @@ export default function PlayRoute() {
   // Privacy banner: shown until user dismisses it
   const [privacyAccepted, setPrivacyAccepted] = useState(() => {
     if (typeof window !== 'undefined') {
-      return localStorage.getItem('eyefit_camera_privacy_accepted') === 'true';
+      return localStorage.getItem('GazeFlap_camera_privacy_accepted') === 'true';
     }
     return false;
   });
 
   const handleAcceptPrivacy = () => {
-    localStorage.setItem('eyefit_camera_privacy_accepted', 'true');
+    localStorage.setItem('GazeFlap_camera_privacy_accepted', 'true');
     setPrivacyAccepted(true);
   };
 
@@ -99,7 +99,7 @@ export default function PlayRoute() {
             })
           });
           // Persist session result to localStorage for the Results page
-          localStorage.setItem('eyefit_last_session', JSON.stringify(res));
+          localStorage.setItem('GazeFlap_last_session', JSON.stringify(res));
           setGamificationResult(res);
           // Navigate to the Results page after a short moment so the XP
           // animation is visible first
@@ -127,7 +127,7 @@ export default function PlayRoute() {
       <div className="w-full max-w-5xl">
         <div className="mb-6 flex justify-between items-end">
           <div>
-            <h1 className="text-3xl font-bold">EyeFit Challenge</h1>
+            <h1 className="text-3xl font-bold">GazeFlap Challenge</h1>
             <p className="text-zinc-400">Gaze + Push-Ups → Adaptive Difficulty</p>
           </div>
           
@@ -177,7 +177,7 @@ export default function PlayRoute() {
                       <div className="text-4xl mb-4">🎥</div>
                       <h2 className="text-xl font-bold text-white mb-3">Camera Permission</h2>
                       <p className="text-zinc-400 text-sm leading-relaxed mb-6">
-                        EyeFit uses your camera to track your <strong className="text-white">eye movements</strong> and <strong className="text-white">body pose</strong> in real-time.
+                        GazeFlap uses your camera to track your <strong className="text-white">eye movements</strong> and <strong className="text-white">body pose</strong> in real-time.
                         <br /><br />
                         Your camera feed is <strong className="text-green-400">processed entirely on your device</strong>. No video or image data is ever recorded, stored, or sent to any server.
                       </p>

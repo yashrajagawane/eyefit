@@ -38,11 +38,12 @@ body {
   border: 1px solid rgba(255, 255, 255, 0.1);
 }
 
-/* Neon glow utilities */
+/* Visual glow utilities */
 .neon-glow {
   box-shadow: 0 0 15px rgba(139, 92, 246, 0.5);
 }
 
 .neon-text-glow {
-  text-shadow: 0 0 8px rgba(139, 92, 246, 0.6);
+  /* Keep the utility for backwards-compatible class names without glowing text. */
+  text-shadow: none;
 }

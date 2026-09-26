@@ -25,13 +25,13 @@ export default function EnduranceRoute() {
   
   const [privacyAccepted, setPrivacyAccepted] = useState(() => {
     if (typeof window !== 'undefined') {
-      return localStorage.getItem('eyefit_camera_privacy_accepted') === 'true';
+      return localStorage.getItem('GazeFlap_camera_privacy_accepted') === 'true';
     }
     return false;
   });
 
   const handleAcceptPrivacy = () => {
-    localStorage.setItem('eyefit_camera_privacy_accepted', 'true');
+    localStorage.setItem('GazeFlap_camera_privacy_accepted', 'true');
     setPrivacyAccepted(true);
   };
 
@@ -113,7 +113,7 @@ export default function EnduranceRoute() {
               fatigue_indicator: sessionMetrics.fatigueIndicator
             })
           });
-          localStorage.setItem('eyefit_last_session', JSON.stringify(res));
+          localStorage.setItem('GazeFlap_last_session', JSON.stringify(res));
           setGamificationResult(res);
           setTimeout(() => router.push('/results'), 2200);
         } catch (error) {
@@ -201,7 +201,7 @@ export default function EnduranceRoute() {
                     <div className="bg-zinc-900 border border-white/10 rounded-2xl p-8 max-w-md w-full text-center shadow-2xl">
                       <h2 className="text-xl font-bold text-white mb-3">Camera Permission</h2>
                       <p className="text-zinc-400 text-sm leading-relaxed mb-6">
-                        EyeFit processes video locally. No data is stored or sent.
+                        GazeFlap processes video locally. No data is stored or sent.
                       </p>
                       <button
                         onClick={handleAcceptPrivacy}

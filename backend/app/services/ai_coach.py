@@ -27,7 +27,7 @@ def generate_session_feedback(session: GameSession) -> CoachFeedback:
     client = genai.Client(api_key=api_key)
 
     prompt = f"""
-You are an expert, encouraging AI fitness coach analyzing a user's recent workout session in the EyeFit app (a gamified push-up tracker).
+You are an expert, encouraging AI fitness coach analyzing a user's recent workout session in the GazeFlap app (a gamified push-up tracker).
 Here are the metrics from their latest session:
 
 - Total Reps: {session.total_reps}

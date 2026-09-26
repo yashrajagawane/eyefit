@@ -13,7 +13,7 @@ export function Navbar() {
       <div className="flex items-center gap-2">
         <Link href="/" className="text-xl font-bold tracking-wider neon-text-glow text-primary flex items-center gap-2">
           <span>👀</span>
-          <span>EYEFIT</span>
+          <span>GazeFlap</span>
         </Link>
       </div>
       
